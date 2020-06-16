@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>CREATE CUSTOMER</title>
+</head>
+<body>
+  <form action="/create_customer" method="post">
+    <div class="container">
+
+      <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
+      <input type="text" name="customer_ssn_id" required>
+
+      <label for="customer_name"><b>Csutomer Name</b></label>
+      <input type="text" name="customer_name" required>
+
+      <label for="age"><b>Age</b></label>
+      <input type="number" name="age" required>
+
+      <label for="address"><b>Address</b></label>
+      <input type="text" name="address" required>
+
+      <label for="state"><b>State</b></label>
+      <select id="state" name="state">
+        <option value="Berlin">Berlin</option>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Nairobi">Nairobi</option>
+        <option value="Helsinki">Helsinki</option>
+      </select>
+
+      <label for="city"><b>City</b></label>
+      <select id="city" name="city">
+        <option value="Berlin">Berlin</option>
+        <option value="Tokyo">Tokyo</option>
+        <option value="Nairobi">Nairobi</option>
+        <option value="Helsinki">Helsinki</option>
+      </select>
+          
+      <button type="submit">Login</button>
+      <button type="reset">Reset</button>
+
+    </div>
+  </form>
+</body>
+</html>
