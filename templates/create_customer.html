@@ -3,39 +3,90 @@
 	<title>CREATE CUSTOMER</title>
 </head>
 <body>
-  <form action="/create_customer" method="post">
+  <script>
+    // Example POST method implementation:
+    async function postData(url = '', data = {}) {
+      // Default options are marked with *
+      const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        //credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        //referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      });
+      return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function create_customer(){
+      var customer_ssn_id = document.getElementById('customer_ssn_id');
+      var customer_name = document.getElementById('customer_name');      
+      var age = document.getElementById('age');   
+      var address = document.getElementById('address');   
+      var state = document.getElementById('state');   
+      var city = document.getElementById('city');
+
+      data={customer_ssn_id:customer_ssn_id.value,
+        customer_name:customer_name.value,
+        age:age.value,
+        address:address.value,
+        state:state.value,
+        city:city.value,
+      };
+
+      postData('/create_customer', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            alert("operation failed!!!");
+          }
+          else{
+            alert(data["message"]);
+          }
+
+        });
+    
+    }
+
+  </script>
+  <form onsubmit="create_customer()">
     <div class="container">
 
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" name="customer_ssn_id" required>
+      <input type="text" id="customer_ssn_id" required><br>
 
-      <label for="customer_name"><b>Csutomer Name</b></label>
-      <input type="text" name="customer_name" required>
+      <label for="customer_name"><b>Customer Name</b></label>
+      <input type="text" id="customer_name" required><br>
 
       <label for="age"><b>Age</b></label>
-      <input type="number" name="age" required>
+      <input type="number" id="age" required><br>
 
       <label for="address"><b>Address</b></label>
-      <input type="text" name="address" required>
+      <input type="text" id="address" required><br>
 
       <label for="state"><b>State</b></label>
-      <select id="state" name="state">
+      <select id="state">
         <option value="Berlin">Berlin</option>
         <option value="Tokyo">Tokyo</option>
         <option value="Nairobi">Nairobi</option>
         <option value="Helsinki">Helsinki</option>
-      </select>
+      </select><br>
 
       <label for="city"><b>City</b></label>
-      <select id="city" name="city">
+      <select id="city">
         <option value="Berlin">Berlin</option>
         <option value="Tokyo">Tokyo</option>
         <option value="Nairobi">Nairobi</option>
         <option value="Helsinki">Helsinki</option>
-      </select>
+      </select><br>
           
-      <button type="submit">Login</button>
-      <button type="reset">Reset</button>
+      <button type="submit">Create</button>
 
     </div>
   </form>

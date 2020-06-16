@@ -24,7 +24,32 @@
       return response.json(); // parses JSON response into native JavaScript objects
     }
 
-    function get_info(){
+    function update_customer(){
+      var new_customer_name = document.getElementById('new_customer_name');
+      var new_age = document.getElementById('new_age');
+      var new_address = document.getElementById('new_address');
+
+      var data = {new_customer_name: new_customer_name.value,
+        new_age: new_age.value,
+        new_address: new_address.value,
+      };
+
+      postData('/update_customer', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            alert("something went wrong!");
+          }
+          else{
+            alert(data["message"]);
+          }
+
+        });
+
+    }
+
+    function get_customer_info(){
       var customer_ssn_id = document.getElementById('customer_ssn_id');
       var customer_id = document.getElementById('customer_id');
 
@@ -42,28 +67,34 @@
       }
       else{
         console.log("fetching data...");
-        // implement ajax call to flask
-        postData('/get_info', data)
+        // implement fetch call to flask
+        postData('/get_customer_info', data)
           .then(data => {
             console.log(data); // JSON data parsed by `response.json()` call
             // refill data
-            old_age.value = data["old_age"];
-            old_address.value = data["old_address"];
+            if (data["message"] == "error"){
+              alert("invalid Customer");
+            }
+            else{
+              old_age.value = data["old_age"];
+              old_address.value = data["old_address"];
+            }
+
           });
 
       }
 
     }
   </script>
-  <form action="/update_customer" method="post">
+  <form onsubmit="update_customer()">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id" required><br>
+      <input type="text" id="customer_ssn_id"><br>
 
       <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id" required><br>
+      <input type="text" id="customer_id"><br>
 
-      <button type="button" onclick="get_info()">Get Info</button><br>
+      <button type="button" onclick="get_customer_info()">Get Info</button><br>
 
       <label for="new_customer_name"><b>New Customer Name</b></label>
       <input type="text" id="new_customer_name" required><br>

@@ -1,0 +1,72 @@
+<html>
+<head>
+	<title>CREATE ACCOUNT</title>
+</head>
+<body>
+  <script>
+    // Example POST method implementation:
+    async function postData(url = '', data = {}) {
+      // Default options are marked with *
+      const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        //mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        //credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        //referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      });
+      return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    function create_account(){
+      var customer_id = document.getElementById('customer_id');
+      var account_type = document.getElementById('account_type');      
+      var deposit_amount = document.getElementById('deposit_amount');   
+
+      data={customer_id:customer_id.value,
+        account_type:account_type.value,
+        deposit_amount:deposit_amount.value,
+      };
+
+      postData('/create_account', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            alert("operation failed!!!");
+          }
+          else{
+            alert(data["message"]);
+          }
+
+        });
+    
+    }
+
+  </script>
+  <form onsubmit="create_account()">
+    <div class="container">
+
+      <label for="customer_id"><b>Customer ID</b></label>
+      <input type="text" id="customer_id" required><br>
+
+      <label for="account_type"><b>Account type</b></label>
+      <select id="account_type" name="account_type">
+        <option value="savings">Savings</option>
+        <option value="current">current</option>
+      </select><br>
+
+      <label for="deposit_amount"><b>Amount</b></label>
+      <input type="number" id="deposit_amount" required><br>
+
+      <button type="submit">Create</button>
+
+    </div>
+  </form>
+</body>
+</html>
