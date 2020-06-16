@@ -8,33 +8,19 @@
   <script>
 
     function delete_customer(){
-      var customer_ssn_id = document.getElementById('customer_ssn_id');
-      var customer_id = document.getElementById('customer_id');
 
-
-      var data = {customer_ssn_id: customer_ssn_id.value, customer_id: customer_id.value};
-
-      console.log(data);
-
-      if (customer_ssn_id.value == "" && customer_id.value == ""){
-        console.log("its empty!!!");
-        alert("Enter either id or SSN");
-      }
-      else{
-        console.log("fetching data...");
-        // implement ajax call to flask
-        postData('/delete_customer', data)
-          .then(data => {
-            console.log(data); // JSON data parsed by `response.json()` call
-            if (data["message"] == "error"){
-              alert("customer not found!");
-            }
-            else{
-              alert(data["message"]);
-            }
-          });
-
-      }
+      // implement ajax call to flask
+      data = {}
+      postData('/delete_customer', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          if (data["message"] == "error"){
+            alert("customer not found!");
+          }
+          else{
+            alert(data["message"]);
+          }
+        });
 
     }
   </script>
@@ -42,10 +28,19 @@
   <form onsubmit="delete_customer()">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id"><br>
+      <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>
 
       <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id"><br>
+      <input type="text" id="customer_id" value="{{ details["customer_id"] }}" readonly><br>
+
+      <label for="customer_name"><b>Customer Name</b></label>
+      <input type="text" id="customer_name" value="{{ details["customer_name"] }}" readonly><br>
+
+      <label for="age"><b>age</b></label>
+      <input type="text" id="age" value="{{ details["age"] }}" readonly><br>
+
+      <label for="address"><b>Address</b></label>
+      <input type="text" id="address" value="{{ details["address"] }}" readonly><br>
           
       <button type="submit">Delete</button>
       

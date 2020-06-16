@@ -1,0 +1,65 @@
+<html>
+<head>
+	<title>DELETE ACCOUNT</title>
+  <script src="./static/fetchapi.js" type="text/javascript"></script>
+</head>
+<body>
+  <script>
+
+    details = {{ details|tojson }};
+    console.log(details);
+    function change_account_type(){
+      var account_id = parseInt(document.getElementById("account_id").value);
+      // console.log(typeof(account_id));
+      document.getElementById("account_type").value = details[account_id];
+    }
+
+    function delete_account(){
+      var account_id = document.getElementById("account_id").value;  
+      // console.log(account_id);
+
+      if (account_id == "None"){
+        alert("pick a valid account");
+        exit();
+      }
+
+      data={account_id:account_id};
+      // console.log(account_id);
+      postData('/delete_account', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            alert("operation failed!!!");
+          }
+          else{
+            alert(data["message"]);
+          }
+
+        });
+    
+    }
+
+  </script>
+  <form onsubmit="delete_account()">
+    <div class="container">
+
+
+      <label for="account_id"><b>Account ID</b></label>
+      <select id="account_id" onchange="change_account_type()">
+        <option value="None"</option>
+      {% for acc_num in details.keys() %}
+        <option value={{ acc_num }}>{{ acc_num }}</option>
+      {% endfor %}
+
+      </select><br>
+
+      <label for="account_type"><b></b>Account Type</label>
+      <input type="text" id="account_type" value="" readonly><br>
+
+      <button type="submit">Delete</button>
+
+    </div>
+  </form>
+</body>
+</html>

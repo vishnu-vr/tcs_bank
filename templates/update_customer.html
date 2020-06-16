@@ -32,67 +32,68 @@
 
     }
 
-    function get_customer_info(){
-      var customer_ssn_id = document.getElementById('customer_ssn_id');
-      var customer_id = document.getElementById('customer_id');
+    // function get_customer_info(){
+    //   var customer_ssn_id = document.getElementById('customer_ssn_id');
+    //   var customer_id = document.getElementById('customer_id');
 
-      var old_age = document.getElementById('old_age');
-      var old_address = document.getElementById('old_address');
+    //   var old_age = document.getElementById('old_age');
+    //   var old_address = document.getElementById('old_address');
 
-      // document.getElementById('old_age').value = 13;
-      var data = {customer_ssn_id: customer_ssn_id.value, customer_id: customer_id.value};
+    //   // document.getElementById('old_age').value = 13;
+    //   var data = {customer_ssn_id: customer_ssn_id.value, customer_id: customer_id.value};
 
-      console.log(data);
+    //   console.log(data);
 
-      if (customer_ssn_id.value == "" && customer_id.value == ""){
-        console.log("its empty!!!");
-        alert("Enter either id of SSN");
-      }
-      else{
-        console.log("fetching data...");
-        // implement fetch call to flask
-        postData('/get_customer_info', data)
-          .then(data => {
-            console.log(data); // JSON data parsed by `response.json()` call
-            // refill data
-            if (data["message"] == "error"){
-              alert("invalid Customer");
-            }
-            else{
-              old_age.value = data["old_age"];
-              old_address.value = data["old_address"];
-            }
+    //   if (customer_ssn_id.value == "" && customer_id.value == ""){
+    //     console.log("its empty!!!");
+    //     alert("Enter either id of SSN");
+    //   }
+    //   else{
+    //     console.log("fetching data...");
+    //     // implement fetch call to flask
+    //     postData('/get_customer_info', data)
+    //       .then(data => {
+    //         console.log(data); // JSON data parsed by `response.json()` call
+    //         // refill data
+    //         if (data["message"] == "error"){
+    //           alert("invalid Customer");
+    //         }
+    //         else{
+    //           old_age.value = data["old_age"];
+    //           old_address.value = data["old_address"];
+    //         }
 
-          });
+    //       });
 
-      }
+    //   }
 
-    }
+    // }
   </script>
   <form onsubmit="update_customer()">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id"><br>
+      <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>
 
       <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id"><br>
+      <input type="text" id="customer_id" value="{{ details["customer_id"] }}" readonly><br>
 
-      <button type="button" onclick="get_customer_info()">Get Info</button><br>
+      <label for="old_customer_name"><b>Old Customer Name</b></label>
+      <input type="text" id="old_customer_name" value="{{ details["old_customer_name"] }}" readonly><br>
 
       <label for="new_customer_name"><b>New Customer Name</b></label>
-      <input type="text" id="new_customer_name" required><br>
+      <input type="text" id="new_customer_name"><br>
 
       <label for="old_age"><b>Old Age</b></label>
-      <input type="number" id="old_age" value="0" readonly><br>
+      <input type="number" id="old_age" value="{{ details["old_age"] }}" readonly><br>
 
       <label for="new_age"><b>New Age</b></label>
-      <input type="number" id="new_age" required><br>
+      <input type="number" id="new_age"><br>
 
       <label for="old_address"><b>Old Address</b></label>
-      <input type="text" id="old_address" value="old adress" readonly><br>
+      <input type="text" id="old_address" value="{{ details["old_address"] }}" readonly><br>
 
       <label for="new_address"><b>New Address</b></label>
-      <input type="text" id="new_address" required><br>
+      <input type="text" id="new_address"><br>
 
 <!--       <label for="state"><b>State</b></label>
       <select id="state" id="state">

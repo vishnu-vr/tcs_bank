@@ -25,6 +25,21 @@ def login():
         res = make_response(jsonify(return_data),200)
         return res
 
+# delete_account
+@app.route('/delete_account',methods = ['POST', 'GET'])
+def delete_account():
+    if request.method == 'GET':
+        account_numbers = [1,2,3]
+        account_types = ["savings","current","savings"]
+        details=dict(zip(account_numbers,account_types))
+        return render_template("delete_account.html",details=details)
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        return_data = {"message":"account deleted successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
+
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])
 def create_account():
@@ -54,7 +69,12 @@ def create_customer():
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
     if request.method == 'GET':
-        return render_template("update_customer.html")
+        details = {"customer_ssn_id" : 123123123123,
+        "customer_id" : 123123123,
+        "old_customer_name" : "vishnu",
+        "old_age" : 21,
+        "old_address" : "palace road"}
+        return render_template("update_customer.html",details=details)
     if request.method == 'POST':
         # print("asd")
         # create customer
@@ -66,9 +86,14 @@ def update_customer():
 @app.route('/delete_customer',methods = ['POST', 'GET'])
 def delete_customer():
     if request.method == 'GET':
-        return render_template("delete_customer.html")
+        details = {"customer_ssn_id" : 123123123123,
+        "customer_id" : 123123123,
+        "customer_name" : "vishnu",
+        "age" : 21,
+        "address" : "palace road"}
+        return render_template("delete_customer.html",details=details)
     if request.method == 'POST':
-        # print("asd")
+        # print(request.get_json())
         # create customer
         return_data = {"message":"deleted successfully"}
         res = make_response(jsonify(return_data),200)
