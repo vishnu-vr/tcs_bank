@@ -12,22 +12,71 @@ def home():
 # login
 @app.route('/login',methods = ['POST', 'GET'])
 def login():
-    # validate login
-	return render_template("login.html")
+    # render the page
+    if request.method == 'GET':
+        return render_template("login.html")
+
+    # if login button pressed
+    if request.method == 'POST':
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+        # print(username)
+        return_data = {"message":"logged in successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
+
+# create_account
+@app.route('/create_account',methods = ['POST', 'GET'])
+def create_account():
+    if request.method == 'GET':
+        return render_template("create_account.html")
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        return_data = {"message":"account created successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
+
 
 # create_customer
-@app.route('/create_customer')
+@app.route('/create_customer',methods = ['POST', 'GET'])
 def create_customer():
-	return render_template()
+    if request.method == 'GET':
+        return render_template("create_customer.html")
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        return_data = {"message":"customer created successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
 
 # update_customer
-@app.route('/update_customer')
+@app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
-	return render_template("update_customer.html")
+    if request.method == 'GET':
+        return render_template("update_customer.html")
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        return_data = {"message":"updated successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
+
+# delete_customer
+@app.route('/delete_customer',methods = ['POST', 'GET'])
+def delete_customer():
+    if request.method == 'GET':
+        return render_template("delete_customer.html")
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        return_data = {"message":"deleted successfully"}
+        res = make_response(jsonify(return_data),200)
+        return res
 
 # get_info
-@app.route('/get_info',methods = ['POST', 'GET'])
-def get_info():
+@app.route('/get_customer_info',methods = ['POST'])
+def get_customer_info():
 
     customer_ssn_id = None
     customer_id = None
@@ -41,11 +90,16 @@ def get_info():
             customer_id = data['customer_id']
             # or from here
 
-    print(customer_id)
-    print(customer_ssn_id)
+    # print(customer_id)
+    # print(customer_ssn_id)
 
-    # return_data should be filled with data fetched form db
-    return_data = {"old_age":60,"old_address":"berlin"}
+    return_data = {"message":"error"}
+
+    # validate the customer
+    valid_customer = 1
+    if valid_customer:
+        # return_data should be filled with data fetched form db
+        return_data = {"old_age":60,"old_address":"berlin"}
 
     res = make_response(jsonify(return_data),200)
 
