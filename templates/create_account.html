@@ -5,34 +5,36 @@
 </head>
 <body>
   <script>
-
-    function create_account(){
-      var customer_id = document.getElementById('customer_id');
-      var account_type = document.getElementById('account_type');      
-      var deposit_amount = document.getElementById('deposit_amount');   
-
-      data={customer_id:customer_id.value,
-        account_type:account_type.value,
-        deposit_amount:deposit_amount.value,
-      };
-
-      postData('/create_account', data)
-        .then(data => {
-          console.log(data); // JSON data parsed by `response.json()` call
-          // refill data
-          if (data["message"] == "error"){
-            alert("operation failed!!!");
-          }
-          else{
-            alert(data["message"]);
-          }
-
-        });
-    
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
     }
+    // function create_account(){
+    //   var customer_id = document.getElementById('customer_id');
+    //   var account_type = document.getElementById('account_type');      
+    //   var deposit_amount = document.getElementById('deposit_amount');   
+
+    //   data={customer_id:customer_id.value,
+    //     account_type:account_type.value,
+    //     deposit_amount:deposit_amount.value,
+    //   };
+
+    //   postData('/create_account', data)
+    //     .then(data => {
+    //       console.log(data); // JSON data parsed by `response.json()` call
+    //       // refill data
+    //       if (data["message"] == "error"){
+    //         alert("operation failed!!!");
+    //       }
+    //       else{
+    //         alert(data["message"]);
+    //       }
+
+    //     });
+    
+    // }
 
   </script>
-  <form onsubmit="create_account()">
+  <form action="/create_account" method="post">
     <div class="container">
 
       <label for="customer_id"><b>Customer ID</b></label>
@@ -51,5 +53,8 @@
 
     </div>
   </form>
+  {% if message %}
+    <p><strong>{{ message }}</strong>
+  {% endif %}
 </body>
 </html>

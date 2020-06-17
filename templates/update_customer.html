@@ -6,70 +6,12 @@
 </head>
 <body>
   <script>
-
-    function update_customer(){
-      var new_customer_name = document.getElementById('new_customer_name');
-      var new_age = document.getElementById('new_age');
-      var new_address = document.getElementById('new_address');
-
-      var data = {new_customer_name: new_customer_name.value,
-        new_age: new_age.value,
-        new_address: new_address.value,
-      };
-
-      postData('/update_customer', data)
-        .then(data => {
-          console.log(data); // JSON data parsed by `response.json()` call
-          // refill data
-          if (data["message"] == "error"){
-            alert("something went wrong!");
-          }
-          else{
-            alert(data["message"]);
-          }
-
-        });
-
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
     }
 
-    // function get_customer_info(){
-    //   var customer_ssn_id = document.getElementById('customer_ssn_id');
-    //   var customer_id = document.getElementById('customer_id');
-
-    //   var old_age = document.getElementById('old_age');
-    //   var old_address = document.getElementById('old_address');
-
-    //   // document.getElementById('old_age').value = 13;
-    //   var data = {customer_ssn_id: customer_ssn_id.value, customer_id: customer_id.value};
-
-    //   console.log(data);
-
-    //   if (customer_ssn_id.value == "" && customer_id.value == ""){
-    //     console.log("its empty!!!");
-    //     alert("Enter either id of SSN");
-    //   }
-    //   else{
-    //     console.log("fetching data...");
-    //     // implement fetch call to flask
-    //     postData('/get_customer_info', data)
-    //       .then(data => {
-    //         console.log(data); // JSON data parsed by `response.json()` call
-    //         // refill data
-    //         if (data["message"] == "error"){
-    //           alert("invalid Customer");
-    //         }
-    //         else{
-    //           old_age.value = data["old_age"];
-    //           old_address.value = data["old_address"];
-    //         }
-
-    //       });
-
-    //   }
-
-    // }
   </script>
-  <form onsubmit="update_customer()">
+  <form action="/update_customer" method="post">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
       <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>
@@ -95,27 +37,12 @@
       <label for="new_address"><b>New Address</b></label>
       <input type="text" id="new_address"><br>
 
-<!--       <label for="state"><b>State</b></label>
-      <select id="state" id="state">
-        <option value="Berlin">Berlin</option>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Nairobi">Nairobi</option>
-        <option value="Helsinki">Helsinki</option>
-      </select><br>
-
-      <label for="city"><b>City</b></label>
-      <select id="city" name="city">
-        <option value="Berlin">Berlin</option>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Nairobi">Nairobi</option>
-        <option value="Helsinki">Helsinki</option>
-      </select><br> -->
-          
       <button type="submit">Update</button>
-      
-
     </div>
   </form>
+  {% if message %}
+    <p><strong>{{ message }}</strong>
+  {% endif %}
 </body>
 </html>
 

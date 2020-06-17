@@ -6,26 +6,13 @@
 </head>
 <body>
   <script>
-
-    function delete_customer(){
-
-      // implement ajax call to flask
-      data = {}
-      postData('/delete_customer', data)
-        .then(data => {
-          console.log(data); // JSON data parsed by `response.json()` call
-          if (data["message"] == "error"){
-            alert("customer not found!");
-          }
-          else{
-            alert(data["message"]);
-          }
-        });
-
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
     }
+
   </script>
 
-  <form onsubmit="delete_customer()">
+  <form action="/delete_customer" method="post">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
       <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>

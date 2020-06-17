@@ -6,60 +6,60 @@
 </head>
 <body>
   <script>
-    current_selected_account_id = "";
+    // current_selected_account_id = "";
 
-    function deposit_withdraw_transfer(d=0,t=0,w=0){
-      if (d == 1){
+    // function deposit_withdraw_transfer(d=0,t=0,w=0){
+    //   if (d == 1){
 
-        data = {account_id:current_selected_account_id};
+    //     data = {account_id:current_selected_account_id};
 
-        postData('/deposit', data)
-          .then(data => {
-            console.log(data); // JSON data parsed by `response.json()` call
-            // refill data
-            if (data["message"] == "error"){
-              alert("something went wrong!");
-            }
-            else{
-              alert("deposited");
-            }
+    //     postData('/deposit', data)
+    //       .then(data => {
+    //         console.log(data); // JSON data parsed by `response.json()` call
+    //         // refill data
+    //         if (data["message"] == "error"){
+    //           alert("something went wrong!");
+    //         }
+    //         else{
+    //           alert("deposited");
+    //         }
 
-          });        
+    //       });        
 
-      }
-      else if (t==1){
-        data = {account_id:current_selected_account_id};
+    //   }
+    //   else if (t==1){
+    //     data = {account_id:current_selected_account_id};
 
-        postData('/transfer', data)
-          .then(data => {
-            console.log(data); // JSON data parsed by `response.json()` call
-            // refill data
-            if (data["message"] == "error"){
-              alert("something went wrong!");
-            }
-            else{
-              alert("deposited");
-            }
+    //     postData('/transfer', data)
+    //       .then(data => {
+    //         console.log(data); // JSON data parsed by `response.json()` call
+    //         // refill data
+    //         if (data["message"] == "error"){
+    //           alert("something went wrong!");
+    //         }
+    //         else{
+    //           alert("deposited");
+    //         }
 
-          }); 
-      }
-      else{
-        data = {account_id:current_selected_account_id};
+    //       }); 
+    //   }
+    //   else{
+    //     data = {account_id:current_selected_account_id};
 
-        postData('/withdraw', data)
-          .then(data => {
-            console.log(data); // JSON data parsed by `response.json()` call
-            // refill data
-            if (data["message"] == "error"){
-              alert("something went wrong!");
-            }
-            else{
-              alert("deposited");
-            }
+    //     postData('/withdraw', data)
+    //       .then(data => {
+    //         console.log(data); // JSON data parsed by `response.json()` call
+    //         // refill data
+    //         if (data["message"] == "error"){
+    //           alert("something went wrong!");
+    //         }
+    //         else{
+    //           alert("deposited");
+    //         }
 
-          }); 
-      }
-    }
+    //       }); 
+    //   }
+    // }
 
     function select_account(passed_data = "not_given",id="accounts"){
 
@@ -68,7 +68,7 @@
 
       selected_account = document.getElementById(id);
 
-      current_selected_account_id = selected_account.value;
+      document.getElementById('account_id').value = selected_account.value;
 
       if (passed_data == "not_given"){
         
@@ -174,7 +174,7 @@
     }
 
   </script>
-  <form>
+  <form method="post">
     <div class="container">
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
       <input type="text" id="customer_ssn_id"><br>
@@ -182,15 +182,13 @@
         <h4>OR</h4>
       </div>
       <label for="account_id"><b>Account ID</b></label>
-      <input type="text" id="account_id"><br>
-
-          
+      <input type="text" name="account_id" id="account_id"><br>
+ 
       <button type="button" onclick="get_acount_details()">Get Detials</button><br><br>
-      
-
     </div>
-  </form>
+<!--   </form>
 
+  <form> -->
     <div style="display:none;" id="details_div">
       <label for="accounts"><b>accounts</b></label>
       <select id="accounts" name="accounts" onchange="select_account()">
@@ -213,10 +211,11 @@
     </div><br>
 
     <div id="deposit_withdraw_transfer" style="display:none;">
-      <button type="button" onclick="deposit_withdraw_transfer(d=1)">Deposit</button><br><br>
-      <button type="button" onclick="deposit_withdraw_transfer(w=1)">withdraw</button><br><br>
-      <button type="button" onclick="deposit_withdraw_transfer(t=1)">transfer</button><br><br>
+      <button type="submit" formaction="/deposit">Deposit</button><br><br>
+      <button type="submit" formaction="/withdraw">withdraw</button><br><br>
+      <button type="submit" formaction="/transfer">transfer</button><br><br>
     </div>
+  </form>
 
 </body>
 </html>

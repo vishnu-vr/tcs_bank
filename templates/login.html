@@ -5,35 +5,25 @@
 </head>
 <body>
   <script>
-    function login(){
-      var username = document.getElementById('username');
-      var password = document.getElementById('password');
-
-    data = {username:username.value, password:password.value};
-
-    postData('/login', data)
-      .then(data => {
-        console.log(data); // JSON data parsed by `response.json()` call
-        if (data["message"] == "error"){
-          alert("user not found!");
-        }
-        else{
-          alert(data["message"]);
-        }
-      });    
-
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
     }
-  </script>
-  <form onsubmit="login()">
+</script>
+  <form action="/login" method="post">
     <div class="container">
 
       <label for="username"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" id="username" required>
+      <input type="text" placeholder="Enter Username" name="username" value="{{
+          request.form.username }}" required>
 
       <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" id="password" required>
+      <input type="password" placeholder="Enter Password" name="password" required>
           
       <button type="submit">Login</button>
+
+      {% if error %}
+        <p><strong>Error:</strong> {{ error }}
+      {% endif %}
 
     </div>
   </form>

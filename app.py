@@ -1,9 +1,19 @@
-from flask import Flask,request,render_template,redirect,url_for,make_response,jsonify,json
+from flask import Flask,request,render_template,redirect,url_for,make_response,jsonify,json,g,flash
 import sql_func as sql
+import sqlite3
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.secret_key = "asdsad890asdashdlahdlj1n2j3bjk4bhkbj12n3jl1"
+
+DATABASE = '/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app/bank.db'
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+    # return sqlite3.connect(DATABASE)
 
 # home
 @app.route('/')
@@ -15,16 +25,27 @@ def home():
 def login():
     # render the page
     if request.method == 'GET':
-        return render_template("login.html")
+        return render_template("login.html",error=0)
 
     # if login button pressed
     if request.method == 'POST':
-        username = request.get_json()['username']
-        password = request.get_json()['password']
-        # print(username)
-        return_data = {"message":"logged in successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+
+        username = request.form['username']
+        password = request.form['password']
+        
+        db = get_db()
+        data_from_db = sql.get_user(db,**{"username":username})
+        # print(data_from_db)
+
+        if data_from_db == None:
+            return render_template("login.html",error="invalid user")
+        elif data_from_db["pass"] == password:
+            return render_template("create_customer.html")
+        else:
+            return render_template("login.html",error="password is incorrect")
+
+        # res = make_response(jsonify(return_data),200)
+        # return res
 
 # get_single_account_detail
 @app.route('/get_single_account_detail',methods=['POST'])
@@ -39,6 +60,27 @@ def get_single_account_detail():
         # return_data = {"message":"account details fetched successfully"}
         res = make_response(jsonify(account_details),200)
         return res
+
+# deposit money
+@app.route('/deposit',methods=['POST'])
+def deposit():
+    if request.method == 'POST':
+        if request.form['account_id']:
+            return "deposit was clicked "+request.form['account_id']
+
+# withdraw money
+@app.route('/withdraw',methods=['POST'])
+def withdraw():
+    if request.method == 'POST':
+        # print("asdasd")
+        return "withdraw was clicked "+request.form['account_id']
+
+# transfer money
+@app.route('/transfer',methods=['POST'])
+def transfer():
+    if request.method == 'POST':
+        # print("asdasd")
+        return "transfer was clicked "+request.form['account_id']
 
 # get account details
 @app.route('/account_details',methods = ['POST', 'GET'])
@@ -56,17 +98,16 @@ def account_details():
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
+    account_numbers = [1,2,3]
+    account_types = ["savings","current","savings"]
+    details=dict(zip(account_numbers,account_types))
     if request.method == 'GET':
-        account_numbers = [1,2,3]
-        account_types = ["savings","current","savings"]
-        details=dict(zip(account_numbers,account_types))
         return render_template("delete_account.html",details=details)
     if request.method == 'POST':
-        # print("asd")
-        # create customer
-        return_data = {"message":"account deleted successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+        if request.form["account_id"] == "None":
+            return render_template("delete_account.html",details=details,message="select any of the account")
+        else:
+            return render_template("delete_account.html",details=details,message="account deleted")
 
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])
@@ -74,11 +115,7 @@ def create_account():
     if request.method == 'GET':
         return render_template("create_account.html")
     if request.method == 'POST':
-        # print("asd")
-        # create customer
-        return_data = {"message":"account created successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+        return render_template("create_account.html",message="account created")
 
 
 # create_customer
@@ -87,28 +124,20 @@ def create_customer():
     if request.method == 'GET':
         return render_template("create_customer.html")
     if request.method == 'POST':
-        # print("asd")
-        # create customer
-        return_data = {"message":"customer created successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+        return render_template("create_customer.html",message="customer created")
 
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
-    if request.method == 'GET':
-        details = {"customer_ssn_id" : 123123123123,
+    details = {"customer_ssn_id" : 123123123123,
         "customer_id" : 123123123,
         "old_customer_name" : "vishnu",
         "old_age" : 21,
         "old_address" : "palace road"}
+    if request.method == 'GET':
         return render_template("update_customer.html",details=details)
     if request.method == 'POST':
-        # print("asd")
-        # create customer
-        return_data = {"message":"updated successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+        return render_template("update_customer.html",message="customer details updated",details=details)
 
 # delete_customer
 @app.route('/delete_customer',methods = ['POST', 'GET'])
@@ -121,11 +150,7 @@ def delete_customer():
         "address" : "palace road"}
         return render_template("delete_customer.html",details=details)
     if request.method == 'POST':
-        # print(request.get_json())
-        # create customer
-        return_data = {"message":"deleted successfully"}
-        res = make_response(jsonify(return_data),200)
-        return res
+        return "redirect this to any previous page"
 
 # get_info
 @app.route('/get_customer_info',methods = ['POST'])

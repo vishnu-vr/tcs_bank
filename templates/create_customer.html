@@ -5,40 +5,11 @@
 </head>
 <body>
   <script>
-
-    function create_customer(){
-      var customer_ssn_id = document.getElementById('customer_ssn_id');
-      var customer_name = document.getElementById('customer_name');      
-      var age = document.getElementById('age');   
-      var address = document.getElementById('address');   
-      var state = document.getElementById('state');   
-      var city = document.getElementById('city');
-
-      data={customer_ssn_id:customer_ssn_id.value,
-        customer_name:customer_name.value,
-        age:age.value,
-        address:address.value,
-        state:state.value,
-        city:city.value,
-      };
-
-      postData('/create_customer', data)
-        .then(data => {
-          console.log(data); // JSON data parsed by `response.json()` call
-          // refill data
-          if (data["message"] == "error"){
-            alert("operation failed!!!");
-          }
-          else{
-            alert(data["message"]);
-          }
-
-        });
-    
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
     }
-
-  </script>
-  <form onsubmit="create_customer()">
+</script>
+  <form action="/create_customer" method="post">
     <div class="container">
 
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
@@ -73,5 +44,8 @@
 
     </div>
   </form>
+  {% if message %}
+    <p><strong>{{ message }}</strong>
+  {% endif %}
 </body>
 </html>
