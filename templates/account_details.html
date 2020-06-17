@@ -89,6 +89,7 @@
             alert("something went wrong!");
           }
           else{
+            document.getElementById("single_account_details").style.display = "";
             document.getElementById("customer_id").value = data["customer_id"];
             document.getElementById("display_account_id").value = data["account_id"];
             document.getElementById("account_type").value = data["account_type"];
@@ -118,7 +119,7 @@
 
         // if ssn is given instead of account id
         if (customer_ssn_id.value != ""){
-
+          document.getElementById("single_account_details").style.display = "none";
           var data = {customer_ssn_id: customer_ssn_id.value,
           account_id: account_id.value,
           };
