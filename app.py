@@ -35,7 +35,7 @@ def login():
         
         db = get_db()
         data_from_db = sql.get_user(db,**{"login_id":username})
-        print(data_from_db)
+        # print(data_from_db)
 
         if data_from_db == None:
             return render_template("login.html",error="invalid user")
@@ -124,7 +124,24 @@ def create_customer():
     if request.method == 'GET':
         return render_template("create_customer.html")
     if request.method == 'POST':
-        return render_template("create_customer.html",message="customer created")
+        if len(request.form["customer_ssn_id"]) != 9:
+            print("ssn id error")
+            return render_template("create_customer.html",message="ssn id should be 9 digits long")
+        else:
+            # db = get_db()
+            # data_from_db = sql.add_new_cus(db,**{"ws_ssn":request.form["customer_ssn_id"],
+            #     "ws_name":request.form["customer_name"],
+            #     "ws_age":request.form["age"],
+            #     "ws_adrs":request.form["address"],
+            #     "state":request.form["state"],
+            #     "city":request.form["city"]})
+            print({"ws_ssn":request.form["customer_ssn_id"],
+                "ws_name":request.form["customer_name"],
+                "ws_age":request.form["age"],
+                "ws_adrs":request.form["address"],
+                "state":request.form["state"],
+                "city":request.form["city"]})
+            return render_template("create_customer.html",message="customer created")
 
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
