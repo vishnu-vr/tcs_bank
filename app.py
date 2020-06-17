@@ -197,14 +197,18 @@ def update_customer():
 @app.route('/delete_customer',methods = ['POST', 'GET'])
 def delete_customer():
     if request.method == 'GET':
-        details = {"customer_ssn_id" : 123123123123,
-        "customer_id" : 123123123,
-        "customer_name" : "vishnu",
-        "age" : 21,
-        "address" : "palace road"}
-        return render_template("delete_customer.html",details=details)
+        return render_template("delete_customer.html")
     if request.method == 'POST':
-        return "redirect this to any previous page"
+        # print(request.get_json())
+        # for i in range(10):
+        #     print(0)
+        data_from_db = sql.del_cus(**{"ws_cust_id":request.get_json()["ws_cust_id"]})
+        # print(data_from_db)
+        # for i in range
+        if data_from_db:
+            return make_response(jsonify({"message":"Customer deletion initiated successfully"}),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 # get_info
 @app.route('/get_customer_info',methods = ['POST'])

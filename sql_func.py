@@ -148,7 +148,7 @@ def get_cus_det(**det):
 		cur.execute("SELECT * FROM customers where "+colunm_name+" = (?)",(det[colunm_name],))
 		customer_det=cur.fetchone()
 		customer_det=split_addr(customer_det)
-		print(customer_det)
+		# print(customer_det)
 		db.commit()
 		return customer_det
 	except Exception as e :
@@ -157,7 +157,24 @@ def get_cus_det(**det):
 		return False
 	finally:
 		db.close()
-	return True
+	return False
+
+def del_cus(**det):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	try:
+		customer_det=get_cus_det(**det)
+		cur.execute("DELETE FROM customers where ws_cust_id = (?)",(det["ws_cust_id"],))
+		db.commit()
+		return customer_det
+	except Exception as e :
+		db.rollback()
+		print(e)
+		return False
+	finally:
+		db.close()
+	return False
 
          
 
@@ -170,12 +187,12 @@ if __name__=='__main__':
 	"created_time":"1234-02-12",
 	"type":"C"
 	}
-	c={"ws_name":"vishnu" ,"ws_adrs":"ayyanthole","state":"kerala","city":"tcr","ws_ssn":"123123123","ws_age":"34"}
+	c={"ws_name":"isham1" ,"ws_adrs":"puthur","state":"kerala","city":"thrissur","ws_ssn":"786643554","ws_age":"23"}
 	c2={"ws_cust_id":2,"ws_name":"isham1" ,"ws_adrs":"ayyanthole1"}
 	# add_new_user(get_db(),**d)
-	# add_new_cus(get_db(),)
+	add_new_cus(**c)
 	# init_db_customers()
-	update_cus(**c2)
-	print(get_cus_det(**{"ws_cust_id":2}))
+	# update_cus(**c2)
+	# print(get_cus_det(**{"ws_cust_id":2}))
 
 

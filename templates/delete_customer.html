@@ -10,26 +10,124 @@
         window.history.replaceState( null, null, window.location.href );
     }
 
+    function delete_customer(){
+      // alert("dasd");
+      customer_id = document.getElementById("customer_id")
+
+      data = {ws_cust_id:customer_id.value}
+      // console.log(data);
+      postData('/delete_customer', data)
+        .then(data => {
+          // alert("reached here");
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            // document.getElementById("customer_ssn_id").value = "";
+            // document.getElementById("customer_id").value = "";
+            // document.getElementById("customer_name").value = "";
+            // document.getElementById("age").value = "";
+            // document.getElementById("address").value = "";              
+            alert("something went wrong!");
+          }
+          // if everythings working great
+          else{
+            document.getElementById("customer_ssn_id").value = data["ws_ssn"];
+            document.getElementById("customer_id").value = data["ws_cust_id"];
+            document.getElementById("customer_name").value = data["ws_name"];
+            document.getElementById("age").value = data["ws_age"];
+            document.getElementById("address").value = data["ws_adrs"];
+            alert(data["message"]);
+          }
+
+        });
+    
+    }
+
+    function get_customer_details(){
+
+      // document.getElementById("deposit_withdraw_transfer").style.display="";
+
+      var customer_ssn_id = document.getElementById('inp_customer_ssn_id');
+      var customer_id = document.getElementById('inp_customer_id');
+
+      if (customer_ssn_id.value == "" && customer_id.value == ""){
+        alert("enter either ssn or id");
+        location.reload();
+      }
+      else if(customer_ssn_id.value != "" && customer_id.value != ""){
+        alert("don't enter both ssn and id");
+        location.reload();
+      }
+      else{
+
+        // document.getElementById("single_account_details").style.display = "none";
+        var data = {ws_ssn: customer_ssn_id.value,
+        ws_cust_id: customer_id.value,
+        };
+        console.log(data);
+        postData('/customer_details', data)
+          .then(data => {
+            // alert("reached here");
+            console.log(data); // JSON data parsed by `response.json()` call
+            // refill data
+            if (data["message"] == "error"){
+              document.getElementById("customer_ssn_id").value = "";
+              document.getElementById("customer_id").value = "";
+              document.getElementById("customer_name").value = "";
+              document.getElementById("age").value = "";
+              document.getElementById("address").value = "";              
+              alert("something went wrong!");
+            }
+            // if everythings working great
+            else{
+              document.getElementById("customer_ssn_id").value = data["ws_ssn"];
+              document.getElementById("customer_id").value = data["ws_cust_id"];
+              document.getElementById("customer_name").value = data["ws_name"];
+              document.getElementById("age").value = data["ws_age"];
+              document.getElementById("address").value = data["ws_adrs"];
+            }
+
+          });
+
+      }
+
+    }
   </script>
 
-  <form action="/delete_customer" method="post">
+  <form>
     <div class="container">
+
+      <!-- ============================================== -->
+      <!-- ============================================== -->
+      <label for="inp_customer_ssn_id"><b>Customer SSN ID</b></label>
+      <input type="text" name="inp_customer_ssn_id" id="inp_customer_ssn_id"><br>
+      <div>
+        <h4>OR</h4>
+      </div>
+      <label for="inp_customer_id"><b>Customer ID</b></label>
+      <input type="text" name="inp_customer_id" id="inp_customer_id"><br>
+ 
+      <button type="button" onclick="get_customer_details()">Get Detials</button><br><br>
+      <!-- ================================================ -->
+      <!-- ================================================ -->
+
+
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>
+      <input type="text" id="customer_ssn_id" value="" readonly><br>
 
       <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id" value="{{ details["customer_id"] }}" readonly><br>
+      <input type="text" id="customer_id" value="" readonly><br>
 
       <label for="customer_name"><b>Customer Name</b></label>
-      <input type="text" id="customer_name" value="{{ details["customer_name"] }}" readonly><br>
+      <input type="text" id="customer_name" value="" readonly><br>
 
       <label for="age"><b>age</b></label>
-      <input type="text" id="age" value="{{ details["age"] }}" readonly><br>
+      <input type="text" id="age" value="" readonly><br>
 
       <label for="address"><b>Address</b></label>
-      <input type="text" id="address" value="{{ details["address"] }}" readonly><br>
+      <input type="text" id="address" value="" readonly><br>
           
-      <button type="submit">Delete</button>
+      <button type="button" onclick="delete_customer()">Delete</button>
       
 
     </div>
