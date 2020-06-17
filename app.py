@@ -8,12 +8,12 @@ app.secret_key = "asdsad890asdashdlahdlj1n2j3bjk4bhkbj12n3jl1"
 
 DATABASE = 'bank.db'
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-    # return sqlite3.connect(DATABASE)
+# def get_db():
+#     db = getattr(g, '_database', None)
+#     if db is None:
+#         db = g._database = sqlite3.connect(DATABASE)
+#     return db
+#     # return sqlite3.connect(DATABASE)
 
 # home
 @app.route('/')
@@ -33,8 +33,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        db = get_db()
-        data_from_db = sql.get_user(db,**{"login_id":username})
+        data_from_db = sql.get_user(**{"login_id":username})
         # print(data_from_db)
 
         if data_from_db == None:
@@ -128,20 +127,22 @@ def create_customer():
             print("ssn id error")
             return render_template("create_customer.html",message="ssn id should be 9 digits long")
         else:
-            # db = get_db()
-            # data_from_db = sql.add_new_cus(db,**{"ws_ssn":request.form["customer_ssn_id"],
-            #     "ws_name":request.form["customer_name"],
-            #     "ws_age":request.form["age"],
-            #     "ws_adrs":request.form["address"],
-            #     "state":request.form["state"],
-            #     "city":request.form["city"]})
-            print({"ws_ssn":request.form["customer_ssn_id"],
+            data_from_db = sql.add_new_cus(**{"ws_ssn":request.form["customer_ssn_id"],
                 "ws_name":request.form["customer_name"],
                 "ws_age":request.form["age"],
                 "ws_adrs":request.form["address"],
                 "state":request.form["state"],
                 "city":request.form["city"]})
-            return render_template("create_customer.html",message="customer created")
+            # print({"ws_ssn":request.form["customer_ssn_id"],
+            #     "ws_name":request.form["customer_name"],
+            #     "ws_age":request.form["age"],
+            #     "ws_adrs":request.form["address"],
+            #     "state":request.form["state"],
+            #     "city":request.form["city"]})
+            if data_from_db:
+                return render_template("create_customer.html",message="customer created")
+            else:
+                return render_template("create_customer.html",message="something went wrong!!!")
 
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
