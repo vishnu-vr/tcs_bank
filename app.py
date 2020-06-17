@@ -180,6 +180,8 @@ def update_customer():
         return render_template("update_customer.html")
     if request.method == 'POST':
         # print(request.get_json())
+        # for i in range(10):
+        #     print(0)
         data_to_send = {}
         for key,value in request.get_json().items():
             if value != "":

@@ -14,10 +14,12 @@
       new_customer_name = document.getElementById("new_customer_name");
       new_age = document.getElementById("new_age");
       new_address = document.getElementById("new_address");
+      customer_id = document.getElementById("customer_id");
 
       data = {ws_name:new_customer_name.value,
               ws_age:new_age.value,
               ws_adrs:new_address.value,
+              ws_cust_id : customer_id.value,
             };
 
       postData('/update_customer', data)
