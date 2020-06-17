@@ -6,14 +6,19 @@
 </head>
 <body>
   <script>
+    current_selected_account_id = "";
 
-    function select_account(passed_data = "not_given"){
+    function select_account(passed_data = "not_given",id="accounts"){
 
       single_account_details = document.getElementById("single_account_details");
       single_account_details.style.display = "";
 
+      selected_account = document.getElementById(id);
+
+      current_selected_account_id = selected_account.value;
+
       if (passed_data == "not_given"){
-        selected_account = document.getElementById("accounts");
+        
         console.log(selected_account.value);
 
         data = {account_id:selected_account.value};
@@ -42,12 +47,19 @@
 
     }
 
-    function get_acount_details(){
+    function get_acount_details(deposit=0,withdraw=0,transfer=0){
+
+      document.getElementById("deposit_withdraw_transfer").style.display="";
+
       var customer_ssn_id = document.getElementById('customer_ssn_id');
       var account_id = document.getElementById('account_id');
 
       if (customer_ssn_id.value == "" && account_id.value == ""){
         alert("enter either ssn or id");
+      }
+      else if(customer_ssn_id.value != "" && account_id.value != ""){
+        alert("don't enter both ssn and id");
+        location.reload();
       }
       else{
 
@@ -95,8 +107,11 @@
         }
         // if account id is given
         else{
+          // disable the accounts list dropdown when a specific account id is given
+          var acc = document.getElementById("details_div");
+          acc.style.display = "none";
           console.log("asdasd");
-          select_account(passed_data = data);
+          select_account(passed_data = data,id='account_id');
         }
 
       }
@@ -114,21 +129,6 @@
       <label for="account_id"><b>Account ID</b></label>
       <input type="text" id="account_id"><br>
 
-<!--       <label for="state"><b>State</b></label>
-      <select id="state" id="state">
-        <option value="Berlin">Berlin</option>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Nairobi">Nairobi</option>
-        <option value="Helsinki">Helsinki</option>
-      </select><br>
-
-      <label for="city"><b>City</b></label>
-      <select id="city" name="city">
-        <option value="Berlin">Berlin</option>
-        <option value="Tokyo">Tokyo</option>
-        <option value="Nairobi">Nairobi</option>
-        <option value="Helsinki">Helsinki</option>
-      </select><br> -->
           
       <button type="button" onclick="get_acount_details()">Get Detials</button><br><br>
       
@@ -141,7 +141,7 @@
       <select id="accounts" name="accounts" onchange="select_account()">
 
       </select><br>
-    </div>
+    </div><br>
 
     <div style="display:none;" id="single_account_details">
       <label for="customer_id"><b>Customer ID</b></label>
@@ -155,6 +155,12 @@
 
       <label for="balance"><b>Balance</b></label>
       <input type="text" id="balance" readonly><br>
+    </div><br>
+
+    <div id="deposit_withdraw_transfer" style="display:none;">
+      <button type="button" onclick="deposit()">Deposit</button><br><br>
+      <button type="button" onclick="withdraw()">withdraw</button><br><br>
+      <button type="button" onclick="transfer()">transfer</button><br><br>
     </div>
 
 </body>
