@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 app.secret_key = "asdsad890asdashdlahdlj1n2j3bjk4bhkbj12n3jl1"
 
-DATABASE = '/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app/bank.db'
+DATABASE = 'bank.db'
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -40,7 +40,7 @@ def login():
         if data_from_db == None:
             return render_template("login.html",error="invalid user")
         elif data_from_db["pass"] == password:
-            return render_template("create_customer.html")
+            return render_template("options.html")
         else:
             return render_template("login.html",error="password is incorrect")
 
