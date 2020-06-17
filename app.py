@@ -25,6 +25,33 @@ def login():
         res = make_response(jsonify(return_data),200)
         return res
 
+# get_single_account_detail
+@app.route('/get_single_account_detail',methods=['POST'])
+def get_single_account_detail():
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        account_details = {"customer_id":123123,
+        "account_id":123123123,
+        "account_type":"savings",
+        "balance":50}
+        # return_data = {"message":"account details fetched successfully"}
+        res = make_response(jsonify(account_details),200)
+        return res
+
+# get account details
+@app.route('/account_details',methods = ['POST', 'GET'])
+def account_details():
+    if request.method == 'GET':
+        return render_template("account_details.html")
+    if request.method == 'POST':
+        # print("asd")
+        # create customer
+        account_details = [123,456,789]
+        # return_data = {"message":"account details fetched successfully"}
+        res = make_response(jsonify(account_details),200)
+        return res
+
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
