@@ -1,4 +1,5 @@
 from flask import Flask,request,render_template,redirect,url_for,make_response,jsonify,json
+import sql_func as sql
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
