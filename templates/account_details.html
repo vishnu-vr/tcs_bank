@@ -110,6 +110,7 @@
 
       if (customer_ssn_id.value == "" && account_id.value == ""){
         alert("enter either ssn or id");
+        location.reload();
       }
       else if(customer_ssn_id.value != "" && account_id.value != ""){
         alert("don't enter both ssn and id");
