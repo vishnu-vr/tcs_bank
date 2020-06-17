@@ -10,34 +10,129 @@
         window.history.replaceState( null, null, window.location.href );
     }
 
+    function update_customer(){
+      new_customer_name = document.getElementById("new_customer_name");
+      new_age = document.getElementById("new_age");
+      new_address = document.getElementById("new_address");
+
+      data = {ws_name:new_customer_name.value,
+              ws_age:new_age.value,
+              ws_adrs:new_address.value,
+            };
+
+      postData('/update_customer', data)
+        .then(data => {
+          // alert("reached here");
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            new_customer_name.value = "";
+            new_age.value = "";
+            new_address.value = "";          
+            alert("something went wrong!");
+          }
+          // if everythings working great
+          else{
+            alert(data["message"]);
+          }
+
+        });
+
+    }
+
+    function get_customer_details(){
+
+      // document.getElementById("deposit_withdraw_transfer").style.display="";
+
+      var customer_ssn_id = document.getElementById('inp_customer_ssn_id');
+      var customer_id = document.getElementById('inp_customer_id');
+
+      if (customer_ssn_id.value == "" && customer_id.value == ""){
+        alert("enter either ssn or id");
+        location.reload();
+      }
+      else if(customer_ssn_id.value != "" && customer_id.value != ""){
+        alert("don't enter both ssn and id");
+        location.reload();
+      }
+      else{
+
+        // document.getElementById("single_account_details").style.display = "none";
+        var data = {ws_ssn: customer_ssn_id.value,
+        ws_cust_id: customer_id.value,
+        };
+        console.log(data);
+        postData('/customer_details', data)
+          .then(data => {
+            // alert("reached here");
+            console.log(data); // JSON data parsed by `response.json()` call
+            // refill data
+            if (data["message"] == "error"){
+              document.getElementById("customer_ssn_id").value = "";
+              document.getElementById("customer_id").value = "";
+              document.getElementById("old_customer_name").value = "";
+              document.getElementById("old_age").value = "";
+              document.getElementById("old_address").value = "";              
+              alert("something went wrong!");
+            }
+            // if everythings working great
+            else{
+              document.getElementById("customer_ssn_id").value = data["ws_ssn"];
+              document.getElementById("customer_id").value = data["ws_cust_id"];
+              document.getElementById("old_customer_name").value = data["ws_name"];
+              document.getElementById("old_age").value = data["ws_age"];
+              document.getElementById("old_address").value = data["ws_adrs"];
+            }
+
+          });
+
+      }
+
+    }
+
   </script>
-  <form action="/update_customer" method="post">
+  <form>
     <div class="container">
+
+      <!-- ============================================== -->
+      <!-- ============================================== -->
+      <label for="inp_customer_ssn_id"><b>Customer SSN ID</b></label>
+      <input type="text" name="inp_customer_ssn_id" id="inp_customer_ssn_id"><br>
+      <div>
+        <h4>OR</h4>
+      </div>
+      <label for="inp_customer_id"><b>Customer ID</b></label>
+      <input type="text" name="inp_customer_id" id="inp_customer_id"><br>
+ 
+      <button type="button" onclick="get_customer_details()">Get Detials</button><br><br>
+      <!-- ================================================ -->
+      <!-- ================================================ -->
+
       <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id" value="{{ details["customer_ssn_id"] }}" readonly><br>
+      <input type="text" id="customer_ssn_id" value="" readonly><br>
 
       <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id" value="{{ details["customer_id"] }}" readonly><br>
+      <input type="text" id="customer_id" value="" readonly><br>
 
       <label for="old_customer_name"><b>Old Customer Name</b></label>
-      <input type="text" id="old_customer_name" value="{{ details["old_customer_name"] }}" readonly><br>
+      <input type="text" id="old_customer_name" value="" readonly><br>
 
       <label for="new_customer_name"><b>New Customer Name</b></label>
       <input type="text" id="new_customer_name"><br>
 
       <label for="old_age"><b>Old Age</b></label>
-      <input type="number" id="old_age" value="{{ details["old_age"] }}" readonly><br>
+      <input type="number" id="old_age" value="" readonly><br>
 
       <label for="new_age"><b>New Age</b></label>
       <input type="number" id="new_age"><br>
 
       <label for="old_address"><b>Old Address</b></label>
-      <input type="text" id="old_address" value="{{ details["old_address"] }}" readonly><br>
+      <input type="text" id="old_address" value="" readonly><br>
 
       <label for="new_address"><b>New Address</b></label>
       <input type="text" id="new_address"><br>
 
-      <button type="submit">Update</button>
+      <button type="button" onclick="update_customer()">Update</button>
     </div>
   </form>
   {% if message %}

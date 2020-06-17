@@ -12,6 +12,13 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+def split_addr(det):
+	addr=det["ws_adrs"]
+	adr,state,city=addr.split("#")
+	det["ws_adrs"]=adr
+	det["state"]=state
+	det["city"]=city
+	return det
 
 def get_db():
     # db = getattr(g, '_database', None)
@@ -74,10 +81,13 @@ def init_db_user_store(db=get_db()):
 		)""")
 
 def get_user(**det):
+	db=get_db()
 	db.row_factory = dict_factory
 	cur=db.cursor()
 	cur.execute("SELECT * FROM user_store where login_id = (?)",(det["login_id"],))
-	return cur.fetchone()
+	user=cur.fetchone()
+	db.close()
+	return user
 
 def add_new_user(**det):
 	cur = db.cursor()
@@ -103,17 +113,48 @@ def add_new_cus(**det):
 		db.close()
 	return True
 
-def get_cus_det(db):
-	cur=db.cursor()
-	cur.execute("SELECT * FROM customers")
-	return cur.fetchall()
+def update_cus(**det):
+	db=get_db()
+	cur = db.cursor()
+	colunm_name=list(det.keys())[0]
+	try:
+		cur.execute("UPDATE Customers SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'WHERE CustomerID = 1")
+		customer_det=cur.fetchone()
+		print(customer_det)
+		db.commit()
+	except Exception as e :
+		db.rollback()
+		print(e)
+		return False
+	finally:
+		db.close()
+	return True
+
+def get_cus_det(**det):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	colunm_name=list(det.keys())[0]
+	try:
+		cur.execute("SELECT * FROM customers where "+colunm_name+" = (?)",(det[colunm_name],))
+		customer_det=cur.fetchone()
+		customer_det=split_addr(customer_det)
+		print(customer_det)
+		db.commit()
+		return customer_det
+	except Exception as e :
+		db.rollback()
+		print(e)
+		return False
+	finally:
+		db.close()
+	return True
 
          
 
 if __name__=='__main__':
 	# init_db()
 	# init_db_user_store()
-	db=get_db()
 	usr={
 	"login_id":"cash12",
 	"pass":"cash12",
@@ -124,6 +165,7 @@ if __name__=='__main__':
 	# add_new_user(get_db(),**d)
 	# add_new_cus(get_db(),)
 	# init_db_customers()
-	add_new_cus(db,**c)
+	# add_new_cus(db,**c)
+	get_cus_det(**{"ws_ssn":123123111})
 
 

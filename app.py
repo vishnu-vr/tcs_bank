@@ -144,18 +144,52 @@ def create_customer():
             else:
                 return render_template("create_customer.html",message="something went wrong!!!")
 
+# get customer_details
+@app.route('/customer_details',methods = ['POST'])
+def customer_details():
+    if request.method == 'POST':
+        # # print("asd")
+        # data_from_db = {"ws_ssn": 123123123,
+        #                 "ws_cust_id": 123123123,
+        #                 "ws_name": "vishnu",
+        #                 "ws_age": 16,
+        #                 "ws_adrs": "berlin"}
+
+        data_from_db = 0
+
+        if request.get_json()["ws_ssn"] != "":
+            data_from_db = sql.get_cus_det(**{"ws_ssn":request.get_json()["ws_ssn"]})
+        else:
+            data_from_db = sql.get_cus_det(**{"ws_cust_id":request.get_json()["ws_cust_id"]})
+
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
+
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
-    details = {"customer_ssn_id" : 123123123123,
-        "customer_id" : 123123123,
-        "old_customer_name" : "vishnu",
-        "old_age" : 21,
-        "old_address" : "palace road"}
+    # details = {"customer_ssn_id" : 123123123123,
+    #     "customer_id" : 123123123,
+    #     "old_customer_name" : "vishnu",
+    #     "old_age" : 21,
+    #     "old_address" : "palace road"}
+
     if request.method == 'GET':
-        return render_template("update_customer.html",details=details)
+        return render_template("update_customer.html")
     if request.method == 'POST':
-        return render_template("update_customer.html",message="customer details updated",details=details)
+        # print(request.get_json())
+        data_to_send = {}
+        for key,value in request.get_json().items():
+            if value != "":
+                data_to_send[key] = value
+        print(data_to_send)
+        data_from_db = 1
+        if data_from_db:
+            return make_response(jsonify({"message":"details updated"}),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 # delete_customer
 @app.route('/delete_customer',methods = ['POST', 'GET'])
