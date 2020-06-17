@@ -34,8 +34,8 @@ def login():
         password = request.form['password']
         
         db = get_db()
-        data_from_db = sql.get_user(db,**{"username":username})
-        # print(data_from_db)
+        data_from_db = sql.get_user(db,**{"login_id":username})
+        print(data_from_db)
 
         if data_from_db == None:
             return render_template("login.html",error="invalid user")
