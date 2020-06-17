@@ -111,24 +111,33 @@ def add_new_cus(**det):
 		return False
 	finally:
 		db.close()
-	return True
+	return False
 
 def update_cus(**det):
 	db=get_db()
+	db.row_factory = dict_factory
 	cur = db.cursor()
-	colunm_name=list(det.keys())[0]
+	updatable=["ws_name","ws_age","ws_adrs"]
+	colunm_names=list(det.keys())
+	print(colunm_names)
 	try:
-		cur.execute("UPDATE Customers SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'WHERE CustomerID = 1")
-		customer_det=cur.fetchone()
-		print(customer_det)
+		for cn in colunm_names:
+			if cn not in updatable:
+				continue
+			if cn=="ws_adrs":
+				old_det=get_cus_det(**{"ws_cust_id":det["ws_cust_id"]})
+				det["ws_adrs"]=det["ws_adrs"]+"#"+old_det["state"]+"#"+old_det["city"]
+			cur.execute("UPDATE customers SET "+cn+" = ? where ws_cust_id = ?",(det[cn],det["ws_cust_id"]))
+			print(cn)
 		db.commit()
+		return True
 	except Exception as e :
 		db.rollback()
 		print(e)
 		return False
 	finally:
 		db.close()
-	return True
+	return False
 
 def get_cus_det(**det):
 	db=get_db()
@@ -161,11 +170,12 @@ if __name__=='__main__':
 	"created_time":"1234-02-12",
 	"type":"C"
 	}
-	c={'ws_ssn': "123123123", 'ws_name': 'vishnu', 'ws_age': "30", 'ws_adrs': 'palaace road', 'state': 'Berlin', 'city': 'Berlin'}
+	c={"ws_name":"vishnu" ,"ws_adrs":"ayyanthole","state":"kerala","city":"tcr","ws_ssn":"123123123","ws_age":"34"}
+	c2={"ws_cust_id":2,"ws_name":"isham1" ,"ws_adrs":"ayyanthole1"}
 	# add_new_user(get_db(),**d)
 	# add_new_cus(get_db(),)
 	# init_db_customers()
-	# add_new_cus(db,**c)
-	get_cus_det(**{"ws_ssn":123123111})
+	update_cus(**c2)
+	print(get_cus_det(**{"ws_cust_id":2}))
 
 

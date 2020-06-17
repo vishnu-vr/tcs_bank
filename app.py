@@ -187,9 +187,9 @@ def update_customer():
             if value != "":
                 data_to_send[key] = value
         print(data_to_send)
-        data_from_db = 1
+        data_from_db = sql.update_cus(**data_to_send)
         if data_from_db:
-            return make_response(jsonify({"message":"details updated"}),200)
+            return make_response(jsonify({"message":"Customer update initiated successfully"}),200)
         else:
             return make_response(jsonify({"message":"error"}),200)
 
