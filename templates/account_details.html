@@ -8,6 +8,59 @@
   <script>
     current_selected_account_id = "";
 
+    function deposit_withdraw_transfer(d=0,t=0,w=0){
+      if (d == 1){
+
+        data = {account_id:current_selected_account_id};
+
+        postData('/deposit', data)
+          .then(data => {
+            console.log(data); // JSON data parsed by `response.json()` call
+            // refill data
+            if (data["message"] == "error"){
+              alert("something went wrong!");
+            }
+            else{
+              alert("deposited");
+            }
+
+          });        
+
+      }
+      else if (t==1){
+        data = {account_id:current_selected_account_id};
+
+        postData('/transfer', data)
+          .then(data => {
+            console.log(data); // JSON data parsed by `response.json()` call
+            // refill data
+            if (data["message"] == "error"){
+              alert("something went wrong!");
+            }
+            else{
+              alert("deposited");
+            }
+
+          }); 
+      }
+      else{
+        data = {account_id:current_selected_account_id};
+
+        postData('/withdraw', data)
+          .then(data => {
+            console.log(data); // JSON data parsed by `response.json()` call
+            // refill data
+            if (data["message"] == "error"){
+              alert("something went wrong!");
+            }
+            else{
+              alert("deposited");
+            }
+
+          }); 
+      }
+    }
+
     function select_account(passed_data = "not_given",id="accounts"){
 
       single_account_details = document.getElementById("single_account_details");
@@ -47,7 +100,7 @@
 
     }
 
-    function get_acount_details(deposit=0,withdraw=0,transfer=0){
+    function get_acount_details(){
 
       document.getElementById("deposit_withdraw_transfer").style.display="";
 
@@ -158,9 +211,9 @@
     </div><br>
 
     <div id="deposit_withdraw_transfer" style="display:none;">
-      <button type="button" onclick="deposit()">Deposit</button><br><br>
-      <button type="button" onclick="withdraw()">withdraw</button><br><br>
-      <button type="button" onclick="transfer()">transfer</button><br><br>
+      <button type="button" onclick="deposit_withdraw_transfer(d=1)">Deposit</button><br><br>
+      <button type="button" onclick="deposit_withdraw_transfer(w=1)">withdraw</button><br><br>
+      <button type="button" onclick="deposit_withdraw_transfer(t=1)">transfer</button><br><br>
     </div>
 
 </body>
