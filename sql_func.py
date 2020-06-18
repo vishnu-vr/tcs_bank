@@ -1,17 +1,50 @@
 ## the sql functions
 import sqlite3
 from flask import g,Flask
-from datetime import date
+from datetime import date,datetime
 
-path='/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app'
+# path='/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app'
 # DATABASE = '/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app/bank.db'
 DATABASE="bank.db"
+
+def update_cus_status(det,db):
+	cur = db.cursor()
+	updatable=["status","message","last_updated"]
+	colunm_names=list(det.keys())
+	try:
+		for cn in colunm_names:
+			if cn not in updatable:
+				continue
+			cur.execute("UPDATE cus_status SET "+cn+" = ? where ws_cust_id = ?",(det[cn],det["ws_cust_id"]))
+		return True
+	except Exception as e :
+		db.rollback()
+		print(e)
+	return False
+
+def add_cus_status(det,db):
+	# db=get_db()
+	cur=db.cursor()	
+	try:
+		cur.execute("INSERT INTO cus_status (ws_cust_id,ws_ssn,status,message,last_updated) VALUES (?,?,?,?,?)",
+			(int(det["ws_cust_id"]),
+				int(det["ws_ssn"]),
+				det["status"],
+				det["message"],
+				str(datetime.now())
+				))
+		return True
+	except Exception as e :
+		print(e)
+		db.rollback()
+	return False
 
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
 def split_addr(det):
 	addr=det["ws_adrs"]
 	adr,state,city=addr.split("#")
@@ -39,6 +72,7 @@ def init_db_customers(db=get_db()):
 	# temp={"ws_name":"temp" ,"ws_adrs":"temp","state":"temp","city":"temp","ws_ssn":"000000000","ws_age":"00","ws_cust_id":"100000000"}
 	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "customers", 100000000 ));
 	db.commit()
+	db.close()
 
 def init_db_account(db=get_db()):
 	cur=db.cursor()
@@ -55,6 +89,7 @@ def init_db_account(db=get_db()):
 	# "ws_acct_id":"500000000","ws_cust_id":"temp"}
 	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "account", 500000000 ));
 	db.commit()
+	db.close()
 
 def init_db_transactions(db=get_db()):
 	cur=db.cursor()
@@ -66,6 +101,9 @@ def init_db_transactions(db=get_db()):
 		ws_src_typ TEXT,
 		ws_tgt_typ TEXT
 		)""")
+	db.commit()
+	db.close()
+
 # Customer ID, Account ID, Account Type, Status, Message, Last_Updated
 def init_account_status(db=get_db()):
 	cur=db.cursor()
@@ -75,8 +113,10 @@ def init_account_status(db=get_db()):
 		ws_acct_type text,
 		status TEXT,
 		message TEXT,
-		Last_Updated TEXT
+		last_updated TEXT
 		)""")
+	db.commit()
+	db.close()	
 
 def init_cus_status(db=get_db()):
 	cur=db.cursor()
@@ -85,8 +125,11 @@ def init_cus_status(db=get_db()):
 		ws_ssn INTEGER NOT NULL ,
 		status TEXT,
 		message TEXT,
-		Last_Updated TEXT
+		last_updated TEXT
 		)""")
+	db.commit()
+	db.close()
+
 
 def init_db_user_store(db=get_db()):
 	cur=db.cursor()
@@ -96,6 +139,9 @@ def init_db_user_store(db=get_db()):
 		created_time text,
 		type Text 
 		)""")
+	db.commit()
+	db.close()
+
 
 def get_user(**det):
 	db=get_db()
@@ -117,17 +163,25 @@ def del_table(name):
 	cur=db.cursor()
 	db.execute("DROP TABLE "+name)
 
+
 def add_new_cus(**det):
 	db=get_db()
 	cur = db.cursor()
 	try:
 		cur.execute("INSERT INTO customers (ws_ssn,ws_name,ws_adrs,ws_age) VALUES (?,?,?,?)",
 	    	(int(det["ws_ssn"]),det["ws_name"],det["ws_adrs"]+"#"+det["state"]+"#"+det["city"],int(det["ws_age"])))
-		db.commit()
-		return True
+		det["status"]="ACTIVE"
+		det["message"]="customer created successfully"
+		cur.execute("SELECT last_insert_rowid()")
+		det["ws_cust_id"]=str(cur.fetchone()[0])
+		if add_cus_status(det,db):
+			db.commit()
+			return True
+		else:
+			raise Exception ("NOT logged")	
 	except Exception as e :
 		db.rollback()
-		return False
+		print(e)
 	finally:
 		db.close()
 	return False
@@ -138,7 +192,6 @@ def update_cus(**det):
 	cur = db.cursor()
 	updatable=["ws_name","ws_age","ws_adrs"]
 	colunm_names=list(det.keys())
-	print(colunm_names)
 	try:
 		for cn in colunm_names:
 			if cn not in updatable:
@@ -147,13 +200,17 @@ def update_cus(**det):
 				old_det=get_cus_det(**{"ws_cust_id":det["ws_cust_id"]})
 				det["ws_adrs"]=det["ws_adrs"]+"#"+old_det["state"]+"#"+old_det["city"]
 			cur.execute("UPDATE customers SET "+cn+" = ? where ws_cust_id = ?",(det[cn],det["ws_cust_id"]))
-			print(cn)
-		db.commit()
-		return True
+		log_dic={"message":"customer update complete",
+					"last_updated":str(datetime.now()),
+					"ws_cust_id":det["ws_cust_id"]}
+		if update_cus_status(log_dic,db):	
+			db.commit()
+			return True
+		else:
+			raise Exception ("NOT logged")
 	except Exception as e :
 		db.rollback()
 		print(e)
-		return False
 	finally:
 		db.close()
 	return False
@@ -173,7 +230,6 @@ def get_cus_det(**det):
 	except Exception as e :
 		db.rollback()
 		print(e)
-		return False
 	finally:
 		db.close()
 	return False
@@ -190,7 +246,6 @@ def del_cus(**det):
 	except Exception as e :
 		db.rollback()
 		print(e)
-		return False
 	finally:
 		db.close()
 	return False
@@ -207,7 +262,6 @@ def add_new_account(**det):
 	except Exception as e :
 		print(e)
 		db.rollback()
-		return False
 	finally:
 		db.close()
 	return False
@@ -237,7 +291,6 @@ def get_account_det(**det):
 	except Exception as e :
 		db.rollback()
 		print(e)
-		return False
 	finally:
 		db.close()
 	return False	
@@ -254,10 +307,30 @@ def del_account(**det):
 	except Exception as e :
 		db.rollback()
 		print(e)
-		return False
 	finally:
 		db.close()
 	return False
+
+def get_cus_status(det=None):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	try:
+		if det==None:
+			cur.execute("SELECT * FROM cus_status")
+			status=cur.fetchall()
+		else:
+			cur.execute("SELECT * FROM cus_status where ws_cust_id=(?)",(det["ws_cust_id"],))
+			status=cur.fetchone()
+		db.commit()
+		return status
+	except Exception as e :
+		db.rollback()
+		print(e)
+	finally:
+		db.close()
+	return False
+	
 
 if __name__=='__main__':
 	# init_db()

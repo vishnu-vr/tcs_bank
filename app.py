@@ -25,9 +25,10 @@ def home():
 # login
 @app.route('/login',methods = ['POST', 'GET'])
 def login():
+    title = "login".upper()
     # render the page
     if request.method == 'GET':
-        return render_template("login.html",error=0)
+        return render_template("login.html",error=0,title=title)
 
     # if login button pressed
     if request.method == 'POST':
@@ -39,12 +40,12 @@ def login():
         # print(data_from_db)
 
         if data_from_db == None:
-            return render_template("login.html",error="invalid user")
+            return render_template("login.html",error="invalid user",title=title)
         elif data_from_db["pass"] == password:
             # return render_template("options.html")
             return redirect("/customer_status",302)
         else:
-            return render_template("login.html",error="password is incorrect")
+            return render_template("login.html",error="password is incorrect",title=title)
 
         # res = make_response(jsonify(return_data),200)
         # return res
@@ -110,30 +111,34 @@ def account_details():
 
 @app.route('/customer_status',methods=['POST', 'GET'])
 def customer_status():
-    data_from_db = [{"ws_cust_id":"123123123",
-                    "ws_ssn":"12312313",
-                    "status":"active",
-                    "message":"onnu poda mone",
-                    "last_updated":"yesterday"},
-                    {"ws_cust_id":"32131312",
-                    "ws_ssn":"12312313",
-                    "status":"active",
-                    "message":"onnu poda mone",
-                    "last_updated":"yesterday"}]
-    # data_from_db = sql.
+    title = "customer_status".upper()
 
+    # data_from_db = [{"ws_cust_id":"123123123",
+    #                 "ws_ssn":"12312313",
+    #                 "status":"active",
+    #                 "message":"onnu poda mone",
+    #                 "last_updated":"yesterday"},
+    #                 {"ws_cust_id":"32131312",
+    #                 "ws_ssn":"12312313",
+    #                 "status":"active",
+    #                 "message":"onnu poda mone",
+    #                 "last_updated":"yesterday"}]
+    data_from_db = sql.get_cus_status()
     if request.method == 'GET':
         if data_from_db:
-            return render_template("customer_status.html",customer_details=data_from_db)
+            return render_template("customer_status.html",customer_details=data_from_db,title=title)
         else:
-            return render_template("customer_status.html",message="error",customer_details=data_from_db)
+            return render_template("customer_status.html",message="error",customer_details=data_from_db,title=title)
     if request.method == 'POST':
-        data_from_db = {"ws_cust_id":"0",
-                    "ws_ssn":"0",
-                    "status":"deactivate",
-                    "message":"onnu poda mone",
-                    "last_updated":"yesterday"}
-        # data_from_db = sql.
+        # data_from_db = {"ws_cust_id":"0",
+        #             "ws_ssn":"0",
+        #             "status":"deactivate",
+        #             "message":"onnu poda mone",
+        #             "last_updated":"yesterday"}
+        data_from_db = sql.get_cus_status(request.get_json())
+        print(data_from_db)
+        for i in range(10):
+            print(0)
         if data_from_db:
             return make_response(jsonify(data_from_db),200)
         else:
