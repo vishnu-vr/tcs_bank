@@ -12,7 +12,8 @@
       accounts = document.getElementById("accounts");
 
       selected_account_id = accounts.value;
-
+      // console.log(typeof(selected_account_id));
+      // console.log(document.getElementById(selected_account_id).value);
       data = {ws_acct_id:selected_account_id};
 
       postData('/delete_account', data)
@@ -26,6 +27,7 @@
             alert(data["message"]);
             document.getElementById("account_type").value = "";
             document.getElementById("account_balance").value = "";
+            document.getElementById(selected_account_id).remove();
           }
 
         });
@@ -116,11 +118,13 @@
 
                 var option = document.createElement("option");
                 option.text = "select_one";
+                option.id = "select_one";
                 x.add(option);
                 
                 for (i = 0; i < data.length; i++) {
                   var option = document.createElement("option");
                   option.text = data[i]['ws_acct_id'];
+                  option.id = data[i]['ws_acct_id'];
                   x.add(option);
                 }
 
