@@ -17,12 +17,14 @@ DATABASE = 'bank.db'
 #     return db
 #     # return sqlite3.connect(DATABASE)
 
-# home
-@app.route('/')
+# 
+@app.route('/home')
 def home():
-    return "SEREVER UP!!!"
+    title="home".upper()
+    return render_template('home.html',title=title)
 
 # login
+@app.route('/')
 @app.route('/login',methods = ['POST', 'GET'])
 def login():
     title = "login".upper()

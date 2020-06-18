@@ -1,21 +1,22 @@
 <html>
 <head>
-	<title>{{title}}</title>
+	<title>{{ title }}</title>
   <script src="./static/fetchapi.js" type="text/javascript"></script>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <header><img id = "logo"src="logo.jpeg"></header>
+
+<link rel="stylesheet" type="text/css" href="./static/style.css">
+  <header><img id = "logo"src="./static/logo.jpeg"></header>
 
   <div class="navbar">
       <a href="/home">Home</a>
       <div class="dropdown">
-        <button class="dropbtn">Custromer 
+        <button class="dropbtn">Customer 
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-        <a href="/create_custromer">create custromer</a>
-        <a href="/custromer_status">custromer status</a>
-        <a href="/update_custromer">update custromer</a>
-        <a href="/delete_custromer">delete custromer</a>
+        <a href="/create_customer">create customer</a>
+        <a href="/customer_status">customer status</a>
+        <a href="/update_customer">update customer</a>
+        <a href="/delete_customer">delete customer</a>
         </div>
       </div> 
       <div class="dropdown">
@@ -33,16 +34,23 @@
   </div>
 </head>
 <body>
+  <h1>WELCOME HOME!</h1>
+  <h3>YES WE KNOW THE STYLING IS BAD. WE DID NOT GET ENOUGH TIME AS WE ARE HAVING OUR PROJECT REVIEW AND INTERNAL EXAMS GOING ON.</h3>
+  <p>
+  <h3 style="color:red">I WOULD SUGGEST YOU CHECK THE "CUSTOMER STATUS" BEFORE DOING ANYTHING</h3>
+  </p>
   <script>
     if ( window.history.replaceState ) {
         window.history.replaceState( null, null, window.location.href );
     }
+
   </script>
-
-  <div>
-    <h1>You're logged in!!!<h1>
-  </div>
-
 </body>
 <footer></footer>
 </html>
+
+
+
+
+
+

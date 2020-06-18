@@ -7,6 +7,35 @@
       border: 1px solid black;
     }
 </style>
+<link rel="stylesheet" type="text/css" href="./static/style.css">
+  <header><img id = "logo"src="./static/logo.jpeg"></header>
+
+  <div class="navbar">
+      <a href="/home">Home</a>
+      <div class="dropdown">
+        <button class="dropbtn">Customer 
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+        <a href="/create_customer">create customer</a>
+        <a href="/customer_status">customer status</a>
+        <a href="/update_customer">update customer</a>
+        <a href="/delete_customer">delete customer</a>
+        </div>
+      </div> 
+      <div class="dropdown">
+        <button class="dropbtn">Account
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+        <a href="/account_details">account details</a>
+        <a href="/account_status">account status</a>
+        <a href="/create_account">create account</a>
+        <a href="/delete_account">delete account</a>
+        </div>
+      </div> 
+      <a href="/Logout">Logout</a>
+  </div>
 </head>
 <body>
   <table id="customer_status_table">
@@ -109,6 +138,7 @@
 
   </script>
 </body>
+<footer></footer>
 </html>
 
 
