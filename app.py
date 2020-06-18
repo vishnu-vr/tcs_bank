@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template,redirect,url_for,make_response,jsonify,json,g,flash
+from flask import Flask,request,render_template,redirect,url_for,make_response,jsonify,json,g,flash,session
 import sql_func as sql
 import sqlite3
 
@@ -23,6 +23,11 @@ def home():
     title="home".upper()
     return render_template('home.html',title=title)
 
+@app.route('/Logout')
+def Logout():
+    session.pop('username', None)
+    return redirect('/login',302)
+
 # login
 @app.route('/')
 @app.route('/login',methods = ['POST', 'GET'])
@@ -37,6 +42,7 @@ def login():
 
         username = request.form['username']
         password = request.form['password']
+        session["username"] = request.form['username']
         
         data_from_db = sql.get_user(**{"login_id":username})
         # print(data_from_db)
@@ -45,7 +51,7 @@ def login():
             return render_template("login.html",error="invalid user",title=title)
         elif data_from_db["pass"] == password:
             # return render_template("options.html")
-            return redirect("/customer_status",302)
+            return redirect("/home",302)
         else:
             return render_template("login.html",error="password is incorrect",title=title)
 
@@ -97,11 +103,14 @@ def transfer():
 # get account details
 @app.route('/account_details',methods = ['POST', 'GET'])
 def account_details():
+    if 'username' not in session:
+        return redirect("/login",302)
     title = "GET ACCOUNT DETAILS"
 
     if request.method == 'GET':
         return render_template("account_details.html",title=title)
     if request.method == 'POST':
+        
         # print("asd")
         # create customer
         # data_from_db = [{'ws_cust_id': 2, 'ws_acct_id': 500000002, 'ws_acct_type': 'c', 'ws_acct_balance': 12300.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}, {'ws_cust_id': 2, 'ws_acct_id': 500000004, 'ws_acct_type': 'savings', 'ws_acct_balance': 123123.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}, {'ws_cust_id': 2, 'ws_acct_id': 500000005, 'ws_acct_type': 'savings', 'ws_acct_balance': 12312313.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}]
@@ -122,6 +131,8 @@ def account_details():
 
 @app.route('/account_status',methods=['POST','GET'])
 def account_status():
+    if 'username' not in session:
+        return redirect("/login",302)    
     title = "account_status".upper()
 
     data_from_db = [{"ws_cust_id":"123123123",
@@ -156,6 +167,8 @@ def account_status():
 
 @app.route('/customer_status',methods=['POST', 'GET'])
 def customer_status():
+    if 'username' not in session:
+        return redirect("/login",302)
     title = "customer_status".upper()
 
     # data_from_db = [{"ws_cust_id":"123123123",
@@ -190,6 +203,8 @@ def customer_status():
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
+    if 'username' not in session:
+        return redirect("/login",302)    
     title = "delete_account".upper()
 
     if request.method == 'GET':
@@ -204,6 +219,8 @@ def delete_account():
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])
 def create_account():
+    if 'username' not in session:
+        return redirect("/login",302)
     title = "create_account".upper()
 
     if request.method == 'GET':
@@ -219,6 +236,8 @@ def create_account():
 # create_customer
 @app.route('/create_customer',methods = ['POST', 'GET'])
 def create_customer():
+    if 'username' not in session:
+        return redirect("/login",302)    
     title = "create_customer".upper()
 
     if request.method == 'GET':
@@ -243,6 +262,8 @@ def create_customer():
 # get customer_details
 @app.route('/customer_details',methods = ['POST'])
 def customer_details():
+    if 'username' not in session:
+        return redirect("/login",302) 
     if request.method == 'POST':
         data_from_db = 0
 
@@ -259,6 +280,8 @@ def customer_details():
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
+    if 'username' not in session:
+        return redirect("/login",302)     
     title = "update_customer".upper()
 
     if request.method == 'GET':
@@ -278,6 +301,8 @@ def update_customer():
 # delete_customer
 @app.route('/delete_customer',methods = ['POST', 'GET'])
 def delete_customer():
+    if 'username' not in session:
+        return redirect("/login",302)     
     title = "delete_customer".upper()
 
     if request.method == 'GET':
@@ -292,6 +317,8 @@ def delete_customer():
 # get_info
 @app.route('/get_customer_info',methods = ['POST'])
 def get_customer_info():
+    if 'username' not in session:
+        return redirect("/login",302)     
 
     customer_ssn_id = None
     customer_id = None
@@ -323,7 +350,8 @@ def get_customer_info():
 # if ssn is given i want all the account_ids belonging to that customer
 @app.route('/get_all_account_ids',methods=['POST'])
 def account_details_testing():
-
+    if 'username' not in session:
+        return redirect("/login",302) 
     if request.method == 'POST':
         data_to_send = {}
         # print(request.get_json())
