@@ -1,0 +1,142 @@
+<html>
+<head>
+	<title>{{ title }}</title>
+  <script src="./static/fetchapi.js" type="text/javascript"></script>
+  <style>
+    table, td, th {
+      border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+  <table id="account_status_table">
+  <tr>
+    <th>Customer ID</th>
+    <th>Account Type</th> 
+    <th>Status</th>
+    <th>Message</th>
+    <th>Last Updated</th>
+    <th>Operations</th>
+  </tr>
+<!--   <tr>
+    <td>Jill</td>
+    <td>Smith</td>
+    <td>50</td>
+    <td>50</td>
+    <td>50</td>
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td>
+    <td>94</td>
+    <td>50</td>
+    <td>50</td>
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>John</td>
+    <td>Doe</td>
+    <td>80</td>
+    <td>50</td>
+    <td>50</td>
+    <td>50</td>
+  </tr> -->
+</table>
+  <script>
+
+    var message = "{{ message }}" ;
+
+    if (message == "error"){
+      alert("Something went Wrong!!!");
+    }
+
+    data = {{ customer_details|tojson }};
+
+    var table = document.getElementById("account_status_table");
+    
+    var new_row = "";
+
+    for (var i = 0; i < data.length; i++) {
+      var row = table.insertRow(1);
+      row.id = data[i]["ws_cust_id"];
+
+      new_row = row.insertCell(0);
+      new_row.innerHTML = data[i]["ws_cust_id"];
+      new_row.id = "ws_cust_id";
+
+      new_row = row.insertCell(1);
+      new_row.innerHTML = data[i]["ws_accnt_type"];
+      new_row.id = "ws_accnt_type";
+
+      new_row = row.insertCell(2);
+      new_row.innerHTML = data[i]["status"];
+      new_row.id = "status";
+
+      new_row = row.insertCell(3);
+      new_row.innerHTML = data[i]["message"];
+      new_row.id = "message";
+
+      new_row = row.insertCell(4);
+      new_row.innerHTML = data[i]["last_updated"];
+      new_row.id = "last_updated";
+
+      new_row = row.insertCell(5);
+      new_row.innerHTML = "<button type='button' id="+data[i]['ws_cust_id']+" onclick='refresh("+data[i]['ws_cust_id']+")'>Refresh</button>";
+      new_row.id = data[i]["ws_cust_id"];
+    }
+
+
+    function refresh(ws_cust_id){
+      console.log(ws_cust_id);
+      data={ws_cust_id:ws_cust_id};
+
+      postData('/account_status', data)
+        .then(data => {
+          console.log(data); // JSON data parsed by `response.json()` call
+          // refill data
+          if (data["message"] == "error"){
+            alert("something went wrong!");
+          }
+          else{
+            var row = document.getElementById(ws_cust_id);
+            row.cells[0].innerHTML = data["ws_cust_id"];
+            row.cells[1].innerHTML = data["ws_accnt_type"];
+            row.cells[2].innerHTML = data["status"];
+            row.cells[3].innerHTML = data["message"];
+            row.cells[4].innerHTML = data["last_updated"];
+          }
+
+        });
+
+    }
+
+    // function get_all_customer_status(){
+    //   data={"message":"gimme_all"};
+    //   postData('/customer_status', data)
+    //     .then(data => {
+    //       console.log(data); // JSON data parsed by `response.json()` call
+    //       // refill data
+    //       if (data["message"] == "error"){
+    //         alert("something went wrong!");
+    //       }
+    //       else{
+    //         update_tables(data);
+    //       }
+
+    //     });
+    // }
+
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
