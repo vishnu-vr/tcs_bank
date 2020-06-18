@@ -137,7 +137,6 @@ def init_db_transactions(acc_id,db=get_db()):
 		ws_tgt_typ TEXT
 		)""")
 
-# Customer ID, Account ID, Account Type, Status, Message, Last_Updated
 def init_account_status(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE account_status(
@@ -163,7 +162,6 @@ def init_cus_status(db=get_db()):
 	db.commit()
 	db.close()
 
-
 def init_db_user_store(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE user_store(
@@ -175,7 +173,6 @@ def init_db_user_store(db=get_db()):
 	db.commit()
 	db.close()
 
-
 def get_user(**det):
 	db=get_db()
 	db.row_factory = dict_factory
@@ -186,9 +183,11 @@ def get_user(**det):
 	return user
 
 def add_new_user(**det):
+	db=get_db()
 	cur = db.cursor()
 	cur.execute("INSERT INTO user_store VALUES (?,?,?,?)",(det["login_id"],det["pass"],str(date.today()),det["type"]))
 	db.commit()
+	db.close()
 	return True
 
 def del_table(name):
@@ -386,13 +385,53 @@ def get_acc_names(**det):
 	else:
 		return False
 
+# ws_cust_id INTEGER NOT NULL PRIMARY KEY,
+# 		ws_acct_id INTEGER NOT NULL,
+# 		ws_amt INTEGER,
+# 		ws_trxn_date TEXT,
+# 		ws_src_typ TEXT,
+# 		ws_tgt_typ
+def add_trans(det,db=get_db()):
+	# cur=db.cursor()
+	# try:
+	# 	tb=transactions+str(det["ws_acct_id"])
+	# 	cur.execute("INSERT INTO "+tb+" VALUES()")
+	# except Exception as e:
+	# 	raise
+	# else:
+	# 	pass
+	# finally:
+	pass
+
+def withdaraw(**det):
+	# db=get_db()
+	# cur=db.cursor()
+	# try:
+	# 	cur.execute("SELECT * from account where ws_acct_id=(?)"(det["ws_acct_id"],))
+	# 	acc=cur.fetchone()
+	# 	if acc=None:
+	# 		return "NO ACCOUNT"
+	# 	else:
+	# 		ba=acc["ws_amt"]-float(det["amount"])
+	# 		cur.execute("UPDATE account SET ws_acct_balance=(?)",(ba,))
+
+	# except Exception as e:
+	# 	raise
+	# else:
+	# 	pass
+	# finally:
+	pass
+
+
+
+
 
 if __name__=='__main__':
 	# init_db()
 	# init_db_user_store()
 	usr={
-	"login_id":"cash12",
-	"pass":"cash12",
+	"login_id":"test",
+	"pass":"test",
 	"created_time":"1234-02-12",
 	"type":"C"
 	}
@@ -407,4 +446,5 @@ if __name__=='__main__':
 	# add_new_account(**d)
 	# print(get_account_det(**{"ws_cust_id":"2"}))
 	# print(del_account(**{"ws_acct_id":"500000004"}))
+	add_new_user(**usr)
 
