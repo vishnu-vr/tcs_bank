@@ -114,12 +114,12 @@ def customer_status():
                     "status":"active",
                     "message":"onnu poda mone",
                     "last_updated":"yesterday"},
-                    {"ws_cust_id":"123123123",
+                    {"ws_cust_id":"32131312",
                     "ws_ssn":"12312313",
                     "status":"active",
                     "message":"onnu poda mone",
                     "last_updated":"yesterday"}]
-    # data_from_db = 0
+    # data_from_db = sql.
 
     if request.method == 'GET':
         if data_from_db:
@@ -127,6 +127,12 @@ def customer_status():
         else:
             return render_template("customer_status.html",message="error",customer_details=data_from_db)
     if request.method == 'POST':
+        data_from_db = {"ws_cust_id":"0",
+                    "ws_ssn":"0",
+                    "status":"deactivate",
+                    "message":"onnu poda mone",
+                    "last_updated":"yesterday"}
+        # data_from_db = sql.
         if data_from_db:
             return make_response(jsonify(data_from_db),200)
         else:
