@@ -114,7 +114,18 @@ def create_account():
     if request.method == 'GET':
         return render_template("create_account.html")
     if request.method == 'POST':
-        return render_template("create_account.html",message="account created")
+        # print(request.get_json())
+        # for i in range(10):
+        #     print(0)
+        data_from_db = 0
+        data_from_db = sql.add_new_account(**request.get_json())
+        print(request.get_json())
+        print()
+        print(data_from_db)
+        if data_from_db:
+            return make_response(jsonify({"message":"Account creation initiated successfully"}),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 
 # create_customer

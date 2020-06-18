@@ -36,18 +36,25 @@ def init_db_customers(db=get_db()):
 		ws_adrs TEXT,
 		ws_age INTEGER
 		)""")
+	temp={"ws_name":"temp" ,"ws_adrs":"temp","state":"temp","city":"temp","ws_ssn":"000000000","ws_age":"00","ws_cust_id":"100000000"}
+	add_new_cus(**temp)
+	del_cus(**{"ws_cust_id":100000000})
 
 def init_db_account(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE account(
 		ws_cust_id INTEGER NOT NULL,
-		ws_acct_id INTEGER NOT NULL PRIMARY KEY,
+		ws_acct_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		ws_acct_type TEXT,
-		ws_acct_balance INTEGER,
+		ws_acct_balance REAL,
 		ws_acct_crdate TEXT,
-		ws_acct_lasttrdate TEXT,
-		ws_acct_duration INTEGER
+		ws_acct_lasttrdate TEXT
+		-- ws_acct_duration INTEGER
 		)""")
+	# temp={"ws_acct_type":"temp" ,"ws_acct_balance":00,"ws_acct_crdate":"temp","ws_acct_lasttrdate":"temp",
+	# "ws_acct_id":"500000000","ws_cust_id":"temp"}
+	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "account", 500000000 ));
+	db.commit()
 
 def init_db_transactions(db=get_db()):
 	cur=db.cursor()
@@ -96,6 +103,7 @@ def add_new_user(**det):
 	return True
 
 def del_table(name):
+	db=get_db()
 	cur=db.cursor()
 	db.execute("DROP TABLE "+name)
 
@@ -177,6 +185,41 @@ def del_cus(**det):
 	return False
 
          
+def add_new_account(**det):
+	db=get_db()
+	cur = db.cursor()
+	try:
+		cur.execute("""INSERT INTO account (ws_cust_id,ws_acct_type,ws_acct_balance,ws_acct_crdate,ws_acct_lasttrdate)
+		 VALUES (?,?,?,?,?)""",
+		 (int(det["ws_cust_id"]),det["ws_acct_type"],float(det["ws_acct_balance"]),str(date.today()),str(date.today())))
+		db.commit()
+		return True
+	except Exception as e :
+		print(e)
+		db.rollback()
+		return False
+	finally:
+		db.close()
+	return False
+
+def get_account_det(**det):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	acc_id=list(det.keys())[0]
+	try:
+		cur.execute("SELECT * FROM account where "+acc_id+" = (?)",(int(det[acc_id]),))
+		acc_det=cur.fetchone()
+		# print(customer_det)
+		db.commit()
+		return acc_det
+	except Exception as e :
+		db.rollback()
+		print(e)
+		return False
+	finally:
+		db.close()
+	return False	
 
 if __name__=='__main__':
 	# init_db()
@@ -189,10 +232,11 @@ if __name__=='__main__':
 	}
 	c={"ws_name":"isham1" ,"ws_adrs":"puthur","state":"kerala","city":"thrissur","ws_ssn":"786643554","ws_age":"23"}
 	c2={"ws_cust_id":2,"ws_name":"isham1" ,"ws_adrs":"ayyanthole1"}
+	d={"ws_acct_type":"S" ,"ws_acct_balance":"1230340","ws_cust_id":"7"}
 	# add_new_user(get_db(),**d)
-	add_new_cus(**c)
+	# add_new_cus(**c)
 	# init_db_customers()
 	# update_cus(**c2)
 	# print(get_cus_det(**{"ws_cust_id":2}))
-
+	# add_new_account(**d)
 
