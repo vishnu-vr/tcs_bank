@@ -7,12 +7,14 @@
 <body>
   <script>
 
-    function select_account(passed_data = "not_given",id="accounts"){
+    function select_account(passed_data="not_given", id="accounts"){
 
       single_account_details = document.getElementById("single_account_details");
       single_account_details.style.display = "";
 
       selected_account = document.getElementById(id);
+
+      // console.log(selected_account);
 
       document.getElementById('account_id').value = selected_account.value;
 
@@ -20,13 +22,13 @@
         
         console.log(selected_account.value);
 
-        data = {account_id:selected_account.value};
+        data = {ws_acct_id:selected_account.value};
       }
       else{
         data = passed_data;
       }
 
-
+      console.log(data);
       postData('/get_single_account_detail', data)
         .then(data => {
           console.log(data); // JSON data parsed by `response.json()` call
@@ -36,10 +38,10 @@
           }
           else{
             document.getElementById("single_account_details").style.display = "";
-            document.getElementById("customer_id").value = data["customer_id"];
-            document.getElementById("display_account_id").value = data["account_id"];
-            document.getElementById("account_type").value = data["account_type"];
-            document.getElementById("balance").value = data["balance"];
+            document.getElementById("customer_id").value = data["ws_cust_id"];
+            document.getElementById("display_account_id").value = data["ws_acct_id"];
+            document.getElementById("account_type").value = data["ws_acct_type"];
+            document.getElementById("balance").value = data["ws_acct_balance"];
             
           }
 
@@ -47,7 +49,7 @@
 
     }
 
-    function get_acount_details(){
+    function get_account_details(){
 
       document.getElementById("deposit_withdraw_transfer").style.display="";
 
@@ -67,20 +69,22 @@
         // if ssn is given instead of account id
         if (customer_ssn_id.value != ""){
           document.getElementById("single_account_details").style.display = "none";
-          var data = {customer_ssn_id: customer_ssn_id.value,
-          account_id: account_id.value,
+
+          var data = {ws_ssn: customer_ssn_id.value,
+          ws_acct_id: account_id.value,
           };
 
-          postData('/account_details', data)
+          postData('/get_all_account_ids', data)
             .then(data => {
               console.log(data); // JSON data parsed by `response.json()` call
               // refill data
               if (data["message"] == "error"){
-                alert("something went wrong!");
+                alert("something went wrong! Maybe this customer doesn't have any accounts");
+                location.reload();
               }
               else{
                   // display the accounts or account detail
-                  
+                  // data = data["account_ids"]
                   var details_div = document.getElementById("details_div");
                   details_div.style.display = "";
                   var x = document.getElementById("accounts");
@@ -111,7 +115,7 @@
           // disable the accounts list dropdown when a specific account id is given
           var acc = document.getElementById("details_div");
           acc.style.display = "none";
-          console.log("asdasd");
+          // console.log("asdasd");
           select_account(passed_data = data,id='account_id');
         }
 
@@ -130,7 +134,7 @@
       <label for="account_id"><b>Account ID</b></label>
       <input type="text" name="account_id" id="account_id"><br>
  
-      <button type="button" onclick="get_acount_details()">Get Detials</button><br><br>
+      <button type="button" onclick="get_account_details()">Get Detials</button><br><br>
     </div>
 <!--   </form>
 

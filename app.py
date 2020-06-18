@@ -56,13 +56,20 @@ def get_single_account_detail():
     if request.method == 'POST':
         # print("asd")
         # create customer
-        account_details = {"customer_id":123123,
-        "account_id":123123123,
-        "account_type":"savings",
-        "balance":50}
+        # account_details = {"customer_id":123123,
+        # "account_id":123123123,
+        # "account_type":"savings",
+        # "balance":50}
+        data_from_db = sql.get_account_det(**request.get_json())
+        # print(data_from_db)
+        # for i in range(10):
+        #     print(0)
         # return_data = {"message":"account details fetched successfully"}
-        res = make_response(jsonify(account_details),200)
-        return res
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
+
 
 # deposit money
 @app.route('/deposit',methods=['POST'])
@@ -310,6 +317,28 @@ def get_customer_info():
     res = make_response(jsonify(return_data),200)
 
     return res
+
+# if ssn is given i want all the account_ids belonging to that customer
+@app.route('/get_all_account_ids',methods=['POST'])
+def account_details_testing():
+
+    if request.method == 'POST':
+        data_to_send = {}
+        # print(request.get_json())
+        for key,value in request.get_json().items():
+            if value != "":
+                data_to_send[key] = value
+        # print(data_to_send)
+
+        # for i in range(10):
+        #     print(0)
+
+        data_from_db = sql.get_acc_names(**data_to_send)
+        # data_from_db=0
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 
 if __name__ == "__main__":

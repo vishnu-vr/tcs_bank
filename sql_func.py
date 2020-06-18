@@ -39,6 +39,40 @@ def add_cus_status(det,db):
 		db.rollback()
 	return False
 
+def update_acc_status(det,db):
+	cur = db.cursor()
+	updatable=["status","message","last_updated"]
+	colunm_names=list(det.keys())
+	try:
+		for cn in colunm_names:
+			if cn not in updatable:
+				continue
+			cur.execute("UPDATE account_status SET "+cn+" = ? where ws_acct_id = ?",(det[cn],det["ws_acct_id"]))
+		return True
+	except Exception as e :
+		db.rollback()
+		print(e)
+	return False
+
+def add_acc_status(det,db):
+	# db=get_db()
+	cur=db.cursor()	
+	try:
+		print(det)
+		cur.execute("INSERT INTO account_status (ws_cust_id,ws_acct_id,ws_acct_type,status,message,last_updated) VALUES (?,?,?,?,?,?)",
+			(	int(det["ws_cust_id"]),
+				int(det["ws_acct_id"]),
+				det["ws_acct_type"],
+				det["status"],
+				det["message"],
+				str(datetime.now())
+				))
+		return True
+	except Exception as e :
+		print(e)
+		db.rollback()
+	return False
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -91,9 +125,10 @@ def init_db_account(db=get_db()):
 	db.commit()
 	db.close()
 
-def init_db_transactions(db=get_db()):
+def init_db_transactions(acc_id,db=get_db()):
 	cur=db.cursor()
-	cur.execute("""CREATE TABLE transactions(
+	tb="transactions"+str(acc_id)
+	cur.execute("""CREATE TABLE """+tb+"""(
 		ws_cust_id INTEGER NOT NULL PRIMARY KEY,
 		ws_acct_id INTEGER NOT NULL,
 		ws_amt INTEGER,
@@ -101,15 +136,13 @@ def init_db_transactions(db=get_db()):
 		ws_src_typ TEXT,
 		ws_tgt_typ TEXT
 		)""")
-	db.commit()
-	db.close()
 
 # Customer ID, Account ID, Account Type, Status, Message, Last_Updated
 def init_account_status(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE account_status(
-		ws_cust_id INTEGER NOT NULL PRIMARY KEY,
-		ws_acct_id INTEGER NOT NULL ,
+		ws_cust_id INTEGER NOT NULL ,
+		ws_acct_id INTEGER NOT NULL PRIMARY KEY,
 		ws_acct_type text,
 		status TEXT,
 		message TEXT,
@@ -162,7 +195,6 @@ def del_table(name):
 	db=get_db()
 	cur=db.cursor()
 	db.execute("DROP TABLE "+name)
-
 
 def add_new_cus(**det):
 	db=get_db()
@@ -257,8 +289,16 @@ def add_new_account(**det):
 		cur.execute("""INSERT INTO account (ws_cust_id,ws_acct_type,ws_acct_balance,ws_acct_crdate,ws_acct_lasttrdate)
 		 VALUES (?,?,?,?,?)""",
 		 (int(det["ws_cust_id"]),det["ws_acct_type"],float(det["ws_acct_balance"]),str(date.today()),str(date.today())))
-		db.commit()
-		return True
+		cur.execute("SELECT last_insert_rowid()")
+		det["ws_acct_id"]=str(cur.fetchone()[0])
+		det["status"]="ACTIVE"
+		det["message"]="Account creation complete"
+		if add_acc_status(det,db):
+			init_db_transactions(det["ws_acct_id"],db)
+			db.commit()
+			return True
+		else:
+			raise Exception ("NOT logged")
 	except Exception as e :
 		print(e)
 		db.rollback()
@@ -279,9 +319,9 @@ def get_account_det(**det):
 			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(det["ws_cust_id"]),))
 			acc_det=cur.fetchall()
 		elif acc_id=="ws_ssn":
-			cur.execute("SELECT ws_cust_id FROM customer where ws_ssn=(?)",(int(det["ws_ssn"]),))
-			cust_id=fetchone()
-			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(det["ws_cust_id"]),))
+			cur.execute("SELECT ws_cust_id FROM customers where ws_ssn=(?)",(int(det["ws_ssn"]),))
+			cust_id=cur.fetchone()
+			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(cust_id["ws_cust_id"]),))
 			acc_det=cur.fetchall()
 		else:	
 			acc_det=None
@@ -302,8 +342,12 @@ def del_account(**det):
 	try:
 		account_det=get_account_det(**det)
 		cur.execute("DELETE FROM account where ws_acct_id = (?)",(det["ws_acct_id"],))
-		db.commit()
-		return account_det
+		det={"message":"Account deleted","status":"DEACTIVE","last_updated":str(datetime.now())}
+		if update_acc_status(det,db):
+			db.commit()
+			return account_det
+		else:
+			raise Exception("Not logged")
 	except Exception as e :
 		db.rollback()
 		print(e)
@@ -331,6 +375,17 @@ def get_cus_status(det=None):
 		db.close()
 	return False
 	
+def get_acc_names(**det):
+	acc_det=get_account_det(**det)
+	print(acc_det)
+	if acc_det != False:
+		l=[]
+		for i in acc_det:
+			l.append(i["ws_acct_id"])
+		return l
+	else:
+		return False
+
 
 if __name__=='__main__':
 	# init_db()
