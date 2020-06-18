@@ -107,22 +107,37 @@ def account_details():
         else:
             return make_response(jsonify({"message":"error"}),200)
 
+@app.route('/customer_status',methods=['POST', 'GET'])
+def customer_status():
+    if request.method == 'GET':
+        return render_template("customer_status.html")
+    if request.method == 'POST':
+        data_from_db = [{"ws_cust_id":"123123123",
+                        "ws_ssn":"12312313",
+                        "status":"active",
+                        "message":"onnu poda mone",
+                        "last_updated":"yesterday"},
+                        {"ws_cust_id":"123123123",
+                        "ws_ssn":"12312313",
+                        "status":"active",
+                        "message":"onnu poda mone",
+                        "last_updated":"yesterday"}]
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
+
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
-    # account_numbers = [1,2,3]
-    # account_types = ["savings","current","savings"]
-    # details=dict(zip(account_numbers,account_types))
     if request.method == 'GET':
         return render_template("delete_account.html")
     if request.method == 'POST':
-        # print(request.get_json())
         data_from_db = sql.del_account(**request.get_json())
         if data_from_db:
             return make_response(jsonify({"message":"“Account deletion initiated successfully”"}),200)
         else:
             return make_response(jsonify({"message":"error"}),200)
-
 
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])
@@ -130,19 +145,12 @@ def create_account():
     if request.method == 'GET':
         return render_template("create_account.html")
     if request.method == 'POST':
-        # print(request.get_json())
-        # for i in range(10):
-        #     print(0)
         data_from_db = 0
         data_from_db = sql.add_new_account(**request.get_json())
-        print(request.get_json())
-        print()
-        print(data_from_db)
         if data_from_db:
             return make_response(jsonify({"message":"Account creation initiated successfully"}),200)
         else:
             return make_response(jsonify({"message":"error"}),200)
-
 
 # create_customer
 @app.route('/create_customer',methods = ['POST', 'GET'])
@@ -160,28 +168,16 @@ def create_customer():
                 "ws_adrs":request.form["address"],
                 "state":request.form["state"],
                 "city":request.form["city"]})
-            # print({"ws_ssn":request.form["customer_ssn_id"],
-            #     "ws_name":request.form["customer_name"],
-            #     "ws_age":request.form["age"],
-            #     "ws_adrs":request.form["address"],
-            #     "state":request.form["state"],
-            #     "city":request.form["city"]})
+
             if data_from_db:
-                return render_template("create_customer.html",message="customer created")
+                return render_template("create_customer.html",message="Customer creation initiated successfully")
             else:
-                return render_template("create_customer.html",message="something went wrong!!!")
+                return render_template("create_customer.html",message="something went wrong!!! Maybe this customer already exist")
 
 # get customer_details
 @app.route('/customer_details',methods = ['POST'])
 def customer_details():
     if request.method == 'POST':
-        # # print("asd")
-        # data_from_db = {"ws_ssn": 123123123,
-        #                 "ws_cust_id": 123123123,
-        #                 "ws_name": "vishnu",
-        #                 "ws_age": 16,
-        #                 "ws_adrs": "berlin"}
-
         data_from_db = 0
 
         if request.get_json()["ws_ssn"] != "":
@@ -197,18 +193,9 @@ def customer_details():
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
-    # details = {"customer_ssn_id" : 123123123123,
-    #     "customer_id" : 123123123,
-    #     "old_customer_name" : "vishnu",
-    #     "old_age" : 21,
-    #     "old_address" : "palace road"}
-
     if request.method == 'GET':
         return render_template("update_customer.html")
     if request.method == 'POST':
-        # print(request.get_json())
-        # for i in range(10):
-        #     print(0)
         data_to_send = {}
         for key,value in request.get_json().items():
             if value != "":
@@ -226,12 +213,7 @@ def delete_customer():
     if request.method == 'GET':
         return render_template("delete_customer.html")
     if request.method == 'POST':
-        # print(request.get_json())
-        # for i in range(10):
-        #     print(0)
         data_from_db = sql.del_cus(**{"ws_cust_id":request.get_json()["ws_cust_id"]})
-        # print(data_from_db)
-        # for i in range
         if data_from_db:
             return make_response(jsonify({"message":"Customer deletion initiated successfully"}),200)
         else:

@@ -78,6 +78,16 @@ def init_account_status(db=get_db()):
 		Last_Updated TEXT
 		)""")
 
+def init_cus_status(db=get_db()):
+	cur=db.cursor()
+	cur.execute("""CREATE TABLE cus_status(
+		ws_cust_id INTEGER NOT NULL PRIMARY KEY,
+		ws_ssn INTEGER NOT NULL ,
+		status TEXT,
+		message TEXT,
+		Last_Updated TEXT
+		)""")
+
 def init_db_user_store(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE user_store(
@@ -114,6 +124,7 @@ def add_new_cus(**det):
 		cur.execute("INSERT INTO customers (ws_ssn,ws_name,ws_adrs,ws_age) VALUES (?,?,?,?)",
 	    	(int(det["ws_ssn"]),det["ws_name"],det["ws_adrs"]+"#"+det["state"]+"#"+det["city"],int(det["ws_age"])))
 		db.commit()
+		return True
 	except Exception as e :
 		db.rollback()
 		return False
@@ -267,5 +278,5 @@ if __name__=='__main__':
 	# print(get_cus_det(**{"ws_cust_id":2}))
 	# add_new_account(**d)
 	# print(get_account_det(**{"ws_cust_id":"2"}))
-	print(del_account(**{"ws_acct_id":"500000004"}))
+	# print(del_account(**{"ws_acct_id":"500000004"}))
 
