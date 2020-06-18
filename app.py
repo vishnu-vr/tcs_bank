@@ -110,16 +110,19 @@ def account_details():
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
-    account_numbers = [1,2,3]
-    account_types = ["savings","current","savings"]
-    details=dict(zip(account_numbers,account_types))
+    # account_numbers = [1,2,3]
+    # account_types = ["savings","current","savings"]
+    # details=dict(zip(account_numbers,account_types))
     if request.method == 'GET':
-        return render_template("delete_account.html",details=details)
+        return render_template("delete_account.html")
     if request.method == 'POST':
-        if request.form["account_id"] == "None":
-            return render_template("delete_account.html",details=details,message="select any of the account")
+        # print(request.get_json())
+        data_from_db = sql.del_account(**request.get_json())
+        if data_from_db:
+            return make_response(jsonify({"message":"“Account deletion initiated successfully”"}),200)
         else:
-            return render_template("delete_account.html",details=details,message="account deleted")
+            return make_response(jsonify({"message":"error"}),200)
+
 
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])

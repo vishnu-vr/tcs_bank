@@ -36,9 +36,9 @@ def init_db_customers(db=get_db()):
 		ws_adrs TEXT,
 		ws_age INTEGER
 		)""")
-	temp={"ws_name":"temp" ,"ws_adrs":"temp","state":"temp","city":"temp","ws_ssn":"000000000","ws_age":"00","ws_cust_id":"100000000"}
-	add_new_cus(**temp)
-	del_cus(**{"ws_cust_id":100000000})
+	# temp={"ws_name":"temp" ,"ws_adrs":"temp","state":"temp","city":"temp","ws_ssn":"000000000","ws_age":"00","ws_cust_id":"100000000"}
+	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "customers", 100000000 ));
+	db.commit()
 
 def init_db_account(db=get_db()):
 	cur=db.cursor()
@@ -66,16 +66,16 @@ def init_db_transactions(db=get_db()):
 		ws_src_typ TEXT,
 		ws_tgt_typ TEXT
 		)""")
-# Customer ID, Account ID, Account Type, Status, Message, Last Updated
+# Customer ID, Account ID, Account Type, Status, Message, Last_Updated
 def init_account_status(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE account_status(
 		ws_cust_id INTEGER NOT NULL PRIMARY KEY,
-		ws_acct_id INTEGER NOT NULL,
-		ws_amt INTEGER,
-		ws_trxn_date TEXT,
-		ws_src_typ TEXT,
-		ws_tgt_typ TEXT
+		ws_acct_id INTEGER NOT NULL ,
+		ws_acct_type text,
+		status TEXT,
+		message TEXT,
+		Last_Updated TEXT
 		)""")
 
 def init_db_user_store(db=get_db()):
@@ -183,7 +183,6 @@ def del_cus(**det):
 	finally:
 		db.close()
 	return False
-
          
 def add_new_account(**det):
 	db=get_db()
@@ -232,6 +231,23 @@ def get_account_det(**det):
 		db.close()
 	return False	
 
+def del_account(**det):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	try:
+		account_det=get_account_det(**det)
+		cur.execute("DELETE FROM account where ws_acct_id = (?)",(det["ws_acct_id"],))
+		db.commit()
+		return account_det
+	except Exception as e :
+		db.rollback()
+		print(e)
+		return False
+	finally:
+		db.close()
+	return False
+
 if __name__=='__main__':
 	# init_db()
 	# init_db_user_store()
@@ -250,5 +266,6 @@ if __name__=='__main__':
 	# update_cus(**c2)
 	# print(get_cus_det(**{"ws_cust_id":2}))
 	# add_new_account(**d)
-	print(get_account_det(**{"ws_cust_id":"2"}))
+	# print(get_account_det(**{"ws_cust_id":"2"}))
+	print(del_account(**{"ws_acct_id":"500000004"}))
 
