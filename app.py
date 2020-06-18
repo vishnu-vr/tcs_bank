@@ -111,6 +111,40 @@ def account_details():
         else:
             return make_response(jsonify({"message":"error"}),200)
 
+@app.route('/account_status',methods=['POST','GET'])
+def account_status():
+    title = "account_status".upper()
+
+    data_from_db = [{"ws_cust_id":"123123123",
+                    "ws_accnt_type":"current",
+                    "status":"active",
+                    "message":"onnu poda mone",
+                    "last_updated":"yesterday"},
+                    {"ws_cust_id":"32131312",
+                    "ws_accnt_type":"savings",
+                    "status":"active",
+                    "message":"onnu poda mone",
+                    "last_updated":"yesterday"}]
+    # data_from_db=0
+    if request.method == 'GET':
+        if data_from_db:
+            return render_template("account_status.html",customer_details=data_from_db,title=title)
+        else:
+            return render_template("account_status.html",message="error",customer_details=data_from_db,title=title)
+    # single update
+    if request.method == 'POST':
+        data_from_db = {"ws_cust_id":"123",
+                    "ws_accnt_type":"current",
+                    "status":"deactivate",
+                    "message":"onnu poda mone",
+                    "last_updated":"today"}
+        # data_from_db=0
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
+
+
 @app.route('/customer_status',methods=['POST', 'GET'])
 def customer_status():
     title = "customer_status".upper()
@@ -131,6 +165,7 @@ def customer_status():
             return render_template("customer_status.html",customer_details=data_from_db,title=title)
         else:
             return render_template("customer_status.html",message="error",customer_details=data_from_db,title=title)
+    # single update
     if request.method == 'POST':
         # data_from_db = {"ws_cust_id":"0",
         #             "ws_ssn":"0",
@@ -138,9 +173,6 @@ def customer_status():
         #             "message":"onnu poda mone",
         #             "last_updated":"yesterday"}
         data_from_db = sql.get_cus_status(request.get_json())
-        print(data_from_db)
-        for i in range(10):
-            print(0)
         if data_from_db:
             return make_response(jsonify(data_from_db),200)
         else:
