@@ -88,8 +88,10 @@ def transfer():
 # get account details
 @app.route('/account_details',methods = ['POST', 'GET'])
 def account_details():
+    title = "GET ACCOUNT DETAILS"
+
     if request.method == 'GET':
-        return render_template("account_details.html")
+        return render_template("account_details.html",title=title)
     if request.method == 'POST':
         # print("asd")
         # create customer
@@ -147,8 +149,10 @@ def customer_status():
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
 def delete_account():
+    title = "delete_account".upper()
+
     if request.method == 'GET':
-        return render_template("delete_account.html")
+        return render_template("delete_account.html",title=title)
     if request.method == 'POST':
         data_from_db = sql.del_account(**request.get_json())
         if data_from_db:
@@ -159,8 +163,10 @@ def delete_account():
 # create_account
 @app.route('/create_account',methods = ['POST', 'GET'])
 def create_account():
+    title = "create_account".upper()
+
     if request.method == 'GET':
-        return render_template("create_account.html")
+        return render_template("create_account.html",title=title)
     if request.method == 'POST':
         data_from_db = 0
         data_from_db = sql.add_new_account(**request.get_json())
@@ -172,12 +178,14 @@ def create_account():
 # create_customer
 @app.route('/create_customer',methods = ['POST', 'GET'])
 def create_customer():
+    title = "create_customer".upper()
+
     if request.method == 'GET':
-        return render_template("create_customer.html")
+        return render_template("create_customer.html",title=title)
     if request.method == 'POST':
         if len(request.form["customer_ssn_id"]) != 9:
             print("ssn id error")
-            return render_template("create_customer.html",message="ssn id should be 9 digits long")
+            return render_template("create_customer.html",message="ssn id should be 9 digits long",title=title)
         else:
             data_from_db = sql.add_new_cus(**{"ws_ssn":request.form["customer_ssn_id"],
                 "ws_name":request.form["customer_name"],
@@ -187,9 +195,9 @@ def create_customer():
                 "city":request.form["city"]})
 
             if data_from_db:
-                return render_template("create_customer.html",message="Customer creation initiated successfully")
+                return render_template("create_customer.html",message="Customer creation initiated successfully",title=title)
             else:
-                return render_template("create_customer.html",message="something went wrong!!! Maybe this customer already exist")
+                return render_template("create_customer.html",message="something went wrong!!! Maybe this customer already exist",title=title)
 
 # get customer_details
 @app.route('/customer_details',methods = ['POST'])
@@ -210,8 +218,10 @@ def customer_details():
 # update_customer
 @app.route('/update_customer',methods = ['POST', 'GET'])
 def update_customer():
+    title = "update_customer".upper()
+
     if request.method == 'GET':
-        return render_template("update_customer.html")
+        return render_template("update_customer.html",title=title)
     if request.method == 'POST':
         data_to_send = {}
         for key,value in request.get_json().items():
@@ -227,8 +237,10 @@ def update_customer():
 # delete_customer
 @app.route('/delete_customer',methods = ['POST', 'GET'])
 def delete_customer():
+    title = "delete_customer".upper()
+
     if request.method == 'GET':
-        return render_template("delete_customer.html")
+        return render_template("delete_customer.html",title=title)
     if request.method == 'POST':
         data_from_db = sql.del_cus(**{"ws_cust_id":request.get_json()["ws_cust_id"]})
         if data_from_db:
