@@ -109,19 +109,24 @@ def account_details():
 
 @app.route('/customer_status',methods=['POST', 'GET'])
 def customer_status():
+    data_from_db = [{"ws_cust_id":"123123123",
+                    "ws_ssn":"12312313",
+                    "status":"active",
+                    "message":"onnu poda mone",
+                    "last_updated":"yesterday"},
+                    {"ws_cust_id":"123123123",
+                    "ws_ssn":"12312313",
+                    "status":"active",
+                    "message":"onnu poda mone",
+                    "last_updated":"yesterday"}]
+    # data_from_db = 0
+
     if request.method == 'GET':
-        return render_template("customer_status.html")
+        if data_from_db:
+            return render_template("customer_status.html",customer_details=data_from_db)
+        else:
+            return render_template("customer_status.html",message="error",customer_details=data_from_db)
     if request.method == 'POST':
-        data_from_db = [{"ws_cust_id":"123123123",
-                        "ws_ssn":"12312313",
-                        "status":"active",
-                        "message":"onnu poda mone",
-                        "last_updated":"yesterday"},
-                        {"ws_cust_id":"123123123",
-                        "ws_ssn":"12312313",
-                        "status":"active",
-                        "message":"onnu poda mone",
-                        "last_updated":"yesterday"}]
         if data_from_db:
             return make_response(jsonify(data_from_db),200)
         else:

@@ -9,52 +9,6 @@
 </style>
 </head>
 <body>
-  <script>
-
-    get_all_customer_status();
-
-    function refresh(ws_cust_id){
-      console.log(ws_cust_id);
-      
-    }
-
-    function update_tables(data) {
-      var table = document.getElementById("customer_status_table");
-      
-      for (var i = 0; i < data.length; i++) {
-        var row = table.insertRow(1);
-        row.insertCell(0).innerHTML = data[i]["ws_cust_id"];
-        row.insertCell(1).innerHTML = data[i]["ws_ssn"];
-        row.insertCell(2).innerHTML = data[i]["status"];
-        row.insertCell(3).innerHTML = data[i]["message"];
-        row.insertCell(4).innerHTML = data[i]["last_updated"];
-        row.insertCell(5).innerHTML = "<button type='button' id="+data[i]['ws_cust_id']+" onclick='refresh("+data[i]['ws_cust_id']+")'>Refresh</button>";
-      }
-
-    }
-
-    function get_all_customer_status(){
-      data={"message":"gimme_all"};
-      postData('/customer_status', data)
-        .then(data => {
-          console.log(data); // JSON data parsed by `response.json()` call
-          // refill data
-          if (data["message"] == "error"){
-            alert("something went wrong!");
-          }
-          else{
-            update_tables(data);
-          }
-
-        });
-    }
-
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
-    }
-
-  </script>
-  
   <table id="customer_status_table">
   <tr>
     <th>Customer ID</th>
@@ -89,7 +43,68 @@
     <td>50</td>
   </tr> -->
 </table>
+  <script>
 
+    var message = "{{ message }}" ;
+
+    if (message == "error"){
+      alert("Something went Wrong!!!");
+    }
+
+    data = {{ customer_details|tojson }};
+
+    var table = document.getElementById("customer_status_table");
+    
+    for (var i = 0; i < data.length; i++) {
+      var row = table.insertRow(1);
+      row.insertCell(0).innerHTML = data[i]["ws_cust_id"];
+      row.insertCell(1).innerHTML = data[i]["ws_ssn"];
+      row.insertCell(2).innerHTML = data[i]["status"];
+      row.insertCell(3).innerHTML = data[i]["message"];
+      row.insertCell(4).innerHTML = data[i]["last_updated"];
+      row.insertCell(5).innerHTML = "<button type='button' id="+data[i]['ws_cust_id']+" onclick='refresh("+data[i]['ws_cust_id']+")'>Refresh</button>";
+    }
+
+
+    function refresh(ws_cust_id){
+      console.log(ws_cust_id);
+      data={ws_cust_id:ws_cust_id};
+      // postData('/customer_status', data)
+      //   .then(data => {
+      //     console.log(data); // JSON data parsed by `response.json()` call
+      //     // refill data
+      //     if (data["message"] == "error"){
+      //       alert("something went wrong!");
+      //     }
+      //     else{
+      //       document.getElementById(ws_cust_id);
+      //     }
+
+      //   });
+
+    }
+
+    // function get_all_customer_status(){
+    //   data={"message":"gimme_all"};
+    //   postData('/customer_status', data)
+    //     .then(data => {
+    //       console.log(data); // JSON data parsed by `response.json()` call
+    //       // refill data
+    //       if (data["message"] == "error"){
+    //         alert("something went wrong!");
+    //       }
+    //       else{
+    //         update_tables(data);
+    //       }
+
+    //     });
+    // }
+
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+
+  </script>
 </body>
 </html>
 
