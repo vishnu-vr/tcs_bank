@@ -41,7 +41,8 @@ def login():
         if data_from_db == None:
             return render_template("login.html",error="invalid user")
         elif data_from_db["pass"] == password:
-            return render_template("options.html")
+            # return render_template("options.html")
+            return redirect("/customer_status",302)
         else:
             return render_template("login.html",error="password is incorrect")
 
