@@ -8,6 +8,8 @@ app.secret_key = "asdsad890asdashdlahdlj1n2j3bjk4bhkbj12n3jl1"
 
 DATABASE = 'bank.db'
 
+# sql.get_account_det(**{'customer_id':})
+
 # def get_db():
 #     db = getattr(g, '_database', None)
 #     if db is None:
@@ -89,10 +91,21 @@ def account_details():
     if request.method == 'POST':
         # print("asd")
         # create customer
-        account_details = [123,456,789]
+        # data_from_db = [{'ws_cust_id': 2, 'ws_acct_id': 500000002, 'ws_acct_type': 'c', 'ws_acct_balance': 12300.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}, {'ws_cust_id': 2, 'ws_acct_id': 500000004, 'ws_acct_type': 'savings', 'ws_acct_balance': 123123.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}, {'ws_cust_id': 2, 'ws_acct_id': 500000005, 'ws_acct_type': 'savings', 'ws_acct_balance': 12312313.0, 'ws_acct_crdate': '2020-06-18', 'ws_acct_lasttrdate': '2020-06-18'}]
         # return_data = {"message":"account details fetched successfully"}
-        res = make_response(jsonify(account_details),200)
-        return res
+        data_to_send = {}
+        # print(request.get_json())
+        for key,value in request.get_json().items():
+            if value != "":
+                data_to_send[key] = value
+        # print(data_to_send)
+        # for i in range(10):
+        #     print(0)
+        data_from_db = sql.get_account_det(**data_to_send)
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 # delete_account
 @app.route('/delete_account',methods = ['POST', 'GET'])
@@ -197,7 +210,7 @@ def update_customer():
         for key,value in request.get_json().items():
             if value != "":
                 data_to_send[key] = value
-        print(data_to_send)
+        # print(data_to_send)
         data_from_db = sql.update_cus(**data_to_send)
         if data_from_db:
             return make_response(jsonify({"message":"Customer update initiated successfully"}),200)

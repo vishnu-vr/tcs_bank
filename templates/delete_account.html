@@ -6,27 +6,16 @@
 <body>
   <script>
 
-    function select_account(passed_data = "not_given",id="accounts"){
+    account_details = "none";
 
-      account_drop_down = document.getElementById("account_drop_down");
-      account_drop_down.style.display = "";
+    function delete_account(){
+      accounts = document.getElementById("accounts");
 
-      selected_account = document.getElementById(id);
+      selected_account_id = accounts.value;
 
-      // document.getElementById('account_id').value = selected_account.value;
+      data = {ws_acct_id:selected_account_id};
 
-      if (passed_data == "not_given"){
-        
-        console.log(selected_account.value);
-
-        data = {account_id:selected_account.value};
-      }
-      else{
-        data = passed_data;
-      }
-
-
-      postData('/get_single_account_detail', data)
+      postData('/delete_account', data)
         .then(data => {
           console.log(data); // JSON data parsed by `response.json()` call
           // refill data
@@ -34,21 +23,55 @@
             alert("something went wrong!");
           }
           else{
-            document.getElementById("account_drop_down").style.display = "";
-            document.getElementById("customer_id").value = data["customer_id"];
-            document.getElementById("display_account_id").value = data["account_id"];
-            document.getElementById("account_type").value = data["account_type"];
-            document.getElementById("balance").value = data["balance"];
-            
+            alert(data["message"]);
           }
 
         });
 
     }
 
-    function get_acount_details(){
+    function get_acc_type_and_bal(selected_account_id,type=0){
+      if (type == 1){
+        // var acc_type = "null";
+        for (i = 0; i < account_details.length; i++){
+          if (account_details[i]["ws_acct_id"] == selected_account_id){
+            return account_details[i]["ws_acct_balance"];
+          }
+        }
+      }
+      else{
+        for (i = 0; i < account_details.length; i++){
+          if (account_details[i]["ws_acct_id"] == selected_account_id){
+            if (account_details[i]["ws_acct_type"] == 'c'){
+              return "current";
+            }
+            else{
+              return "savings";
+            }
+          }
+        }
+      }
+    }
 
-      // document.getElementById("deposit_withdraw_transfer").style.display="";
+    function select_account(){
+
+      accounts = document.getElementById("accounts");
+
+      selected_account_id = accounts.value;
+
+      // alert(selected_account_id);
+
+      document.getElementById("account_type").value = get_acc_type_and_bal(selected_account_id,type=1);
+      document.getElementById("account_balance").value = get_acc_type_and_bal(selected_account_id);
+    }
+
+    function get_account_details(){
+
+      document.getElementById("accounts_details").style.display="";
+
+      document.getElementById("account_type").value="";
+      document.getElementById("account_balance").value="";
+      account_balance
 
       var customer_ssn_id = document.getElementById('customer_ssn_id');
       var customer_id = document.getElementById('customer_id');
@@ -64,8 +87,8 @@
       else{
 
         // document.getElementById("account_drop_down").style.display = "none";
-        var data = {customer_ssn_id: customer_ssn_id.value,
-        customer_id: customer_id.value,
+        var data = {ws_ssn: customer_ssn_id.value,
+        ws_cust_id: customer_id.value,
         };
 
         postData('/account_details', data)
@@ -74,12 +97,14 @@
             // refill data
             if (data["message"] == "error"){
               alert("something went wrong!");
+              location.reload();
             }
             else{
-                // display the accounts or account detail
-                
+                // storing fetched data to global dictionary
+                account_details = data;
+
                 var details_div = document.getElementById("details_div");
-                details_div.style.display = "inline";
+                details_div.style.display = "";
                 var x = document.getElementById("accounts");
                 x.remove();
                 var x = document.createElement("SELECT");
@@ -93,7 +118,7 @@
                 
                 for (i = 0; i < data.length; i++) {
                   var option = document.createElement("option");
-                  option.text = data[i];
+                  option.text = data[i]['ws_acct_id'];
                   x.add(option);
                 }
 
@@ -121,24 +146,29 @@
       <label for="customer_id"><b>Customer ID</b></label>
       <input type="text" name="customer_id" id="customer_id"><br>
  
-      <button type="button" onclick="get_acount_details()">Get Detials</button><br><br>
+      <button type="button" onclick="get_account_details()">Get Detials</button><br><br>
     </div>
 <!--   </form>
 
   <form> -->
-    <label for="accounts"><b>accounts</b></label>
-    <div style="display:inline;" id="details_div">
+    <div style="display:none;" id="details_div">
+      <label for="accounts"><b>accounts</b></label>
       <select id="accounts" name="accounts" onchange="select_account()">
 
       </select><br>
+    </div><br>
 
-    <div>
+    <div style="display:none;" id="accounts_details">
+
       <label for="account_type"><b>Account type</b></label>
       <input type="text" id="account_type" readonly><br>
-    </div><br>
+
+      <label for="account_balance"><b>Account Balance</b></label>
+      <input type="text" id="account_balance" readonly><br>
+
+      <button type="button" onclick="delete_account()">Delete Account</button>
 
     </div><br>
-
 
   </form>
 

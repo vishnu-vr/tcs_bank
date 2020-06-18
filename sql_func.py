@@ -208,8 +208,19 @@ def get_account_det(**det):
 	cur = db.cursor()
 	acc_id=list(det.keys())[0]
 	try:
-		cur.execute("SELECT * FROM account where "+acc_id+" = (?)",(int(det[acc_id]),))
-		acc_det=cur.fetchone()
+		if acc_id=="ws_acct_id":
+			cur.execute("SELECT * FROM account where "+acc_id+" = (?)",(int(det[acc_id]),))
+			acc_det=cur.fetchone()
+		elif acc_id=="ws_cust_id":
+			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(det["ws_cust_id"]),))
+			acc_det=cur.fetchall()
+		elif acc_id=="ws_ssn":
+			cur.execute("SELECT ws_cust_id FROM customer where ws_ssn=(?)",(int(det["ws_ssn"]),))
+			cust_id=fetchone()
+			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(det["ws_cust_id"]),))
+			acc_det=cur.fetchall()
+		else:	
+			acc_det=None
 		# print(customer_det)
 		db.commit()
 		return acc_det
@@ -239,4 +250,5 @@ if __name__=='__main__':
 	# update_cus(**c2)
 	# print(get_cus_det(**{"ws_cust_id":2}))
 	# add_new_account(**d)
+	print(get_account_det(**{"ws_cust_id":"2"}))
 
