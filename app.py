@@ -147,13 +147,13 @@ def account_status():
 	#                 "last_updated":"yesterday"}]
 
 	data_from_db = sql.get_account_status()
-
+	# if method == get it should return details of all accounts present in the db
 	if request.method == 'GET':
 	    if data_from_db:
 	        return render_template("account_status.html",customer_details=data_from_db,title=title)
 	    else:
 	        return render_template("account_status.html",message="error",customer_details=data_from_db,title=title)
-	# single update
+	# single account update details
 	if request.method == 'POST':
 	    # data_from_db = {"ws_cust_id":"123",
 	    #             "ws_accnt_type":"current",
@@ -161,9 +161,9 @@ def account_status():
 	    #             "message":"onnu poda mone",
 	    #             "last_updated":"today"}
 
-	    data_from_db = sql.get_account_status(request.get_json())
-	    
-	    # print(data_from_db)
+	    data_from_db = sql.get_account_status(ws_acct_id=request.get_json()["ws_acct_id"])
+
+	    # print(request.get_json())
 	    # for i in range(10):
 	    # 	print(0)
 

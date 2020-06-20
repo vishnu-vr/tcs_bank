@@ -86,41 +86,41 @@
 
     var table = document.getElementById("account_status_table");
     
-    var new_row = "";
+    var new_cell = "";
 
     for (var i = 0; i < data.length; i++) {
       var row = table.insertRow(1);
-      row.id = data[i]["ws_cust_id"];
+      row.id = data[i]["ws_acct_id"];
 
-      new_row = row.insertCell(0);
-      new_row.innerHTML = data[i]["ws_cust_id"];
-      new_row.id = "ws_cust_id";
+      new_cell = row.insertCell(0);
+      new_cell.innerHTML = data[i]["ws_cust_id"];
+      new_cell.id = "ws_cust_id";
 
-      new_row = row.insertCell(1);
-      new_row.innerHTML = data[i]["ws_acct_type"];
-      new_row.id = "ws_acct_type";
+      new_cell = row.insertCell(1);
+      new_cell.innerHTML = data[i]["ws_acct_type"];
+      new_cell.id = "ws_acct_type";
 
-      new_row = row.insertCell(2);
-      new_row.innerHTML = data[i]["status"];
-      new_row.id = "status";
+      new_cell = row.insertCell(2);
+      new_cell.innerHTML = data[i]["status"];
+      new_cell.id = "status";
 
-      new_row = row.insertCell(3);
-      new_row.innerHTML = data[i]["message"];
-      new_row.id = "message";
+      new_cell = row.insertCell(3);
+      new_cell.innerHTML = data[i]["message"];
+      new_cell.id = "message";
 
-      new_row = row.insertCell(4);
-      new_row.innerHTML = data[i]["last_updated"];
-      new_row.id = "last_updated";
+      new_cell = row.insertCell(4);
+      new_cell.innerHTML = data[i]["last_updated"];
+      new_cell.id = "last_updated";
 
-      new_row = row.insertCell(5);
-      new_row.innerHTML = "<button type='button' id="+data[i]['ws_cust_id']+" onclick='refresh("+data[i]['ws_cust_id']+")'>Refresh</button>";
-      new_row.id = data[i]["ws_cust_id"];
+      new_cell = row.insertCell(5);
+      new_cell.innerHTML = "<button type='button' onclick='refresh("+data[i]['ws_acct_id']+")'>Refresh</button>";
+      new_cell.id = data[i]["ws_cust_id"];
     }
 
 
-    function refresh(ws_cust_id){
-      console.log(ws_cust_id);
-      data={ws_cust_id:ws_cust_id};
+    function refresh(ws_acct_id){
+      console.log(ws_acct_id);
+      data={ws_acct_id:ws_acct_id};
 
       postData('/account_status', data)
         .then(data => {
@@ -130,7 +130,7 @@
             alert("something went wrong!");
           }
           else{
-            var row = document.getElementById(ws_cust_id);
+            var row = document.getElementById(ws_acct_id);
             row.cells[0].innerHTML = data["ws_cust_id"];
             row.cells[1].innerHTML = data["ws_acct_type"];
             row.cells[2].innerHTML = data["status"];
