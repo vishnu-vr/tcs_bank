@@ -34,6 +34,56 @@
   </div>
 </head>
 <body>
+
+
+  <form method="post">
+    <div class="container">
+      <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
+      <input type="text" id="customer_ssn_id"><br>
+      <div>
+        <h4>OR</h4>
+      </div>
+      <label for="account_id"><b>Account ID</b></label>
+      <input type="text" name="account_id" id="account_id"><br>
+ 
+      <button type="button" onclick="get_account_details()">Get Detials</button><br><br>
+    </div>
+<!--   </form>
+
+  <form> -->
+    <div style="display:none;" id="details_div">
+      <label for="accounts"><b>accounts</b></label>
+      <select id="accounts" name="accounts" onchange="select_account()">
+
+      </select><br>
+    </div><br>
+
+    <div style="display:none;" id="single_account_details">
+      <label for="customer_id"><b>Customer ID</b></label>
+      <input type="text" id="customer_id" readonly><br>
+
+      <label for="display_account_id"><b>Account ID</b></label>
+      <input type="text" id="display_account_id" readonly><br>
+
+      <label for="account_type"><b>Account type</b></label>
+      <input type="text" id="account_type" readonly><br>
+
+      <label for="balance"><b>Balance</b></label>
+      <input type="text" id="balance" readonly><br>
+    </div><br>
+
+    <div id="deposit_withdraw_transfer_buttons_div" style="display:none;">
+      <button type="button" onclick="d_w_t_menu(show_options='deposit')">Deposit</button>
+      <button type="button" onclick="d_w_t_menu(show_options='withdraw')">withdraw</button>
+      <button type="button" onclick="d_w_t_menu(show_options='transfer')">transfer</button>
+    </div>
+
+    <br><br>
+
+    <div id="d_w_t_menu_div" style="display:none;">
+    </div>
+
+  </form>
   <script>
 
     function select_account(passed_data="not_given", id="accounts"){
@@ -80,7 +130,7 @@
 
     function get_account_details(){
 
-      document.getElementById("deposit_withdraw_transfer").style.display="";
+      document.getElementById("deposit_withdraw_transfer_buttons_div").style.display="";
 
       var customer_ssn_id = document.getElementById('customer_ssn_id');
       var account_id = document.getElementById('account_id');
@@ -152,49 +202,137 @@
 
     }
 
+
+  // #############################################################
+  var d_w_t_menu_div = document.getElementById("d_w_t_menu_div");
+
+  function d_w_t_menu(show_options=null){
+    // if its hidden make it visible
+    if (d_w_t_menu_div.style.display = "none") d_w_t_menu_div.style.display = "";
+
+    // reset the child elements
+    d_w_t_menu_div.innerHTML = "";
+
+    if (show_options != null){
+
+      // creating label element
+      var newlabel = document.createElement("Label");
+      newlabel.innerHTML = "Enter Amount ";
+      // d_w_t_menu.appendChild(newlabel);
+      d_w_t_menu_div.appendChild(newlabel);
+      // creating input element
+      var newinput = document.createElement("INPUT");
+      newinput.setAttribute("type", "number");
+      newinput.id = show_options+'_amount';
+      newinput.placeholder = show_options+"_amount";
+      d_w_t_menu_div.appendChild(newinput);
+
+      // if transfer option is selected
+      if (show_options == 'transfer'){
+        d_w_t_menu_div.appendChild(document.createElement("br"));
+        d_w_t_menu_div.appendChild(document.createElement("br"));
+        // creating a label for input
+        var account_id_label = document.createElement('label');
+        account_id_label.innerHTML = "Destination Account-ID ";
+        d_w_t_menu_div.appendChild(account_id_label);
+        // creating a number input for destination account_id
+        var account_id_input = document.createElement("INPUT");
+        account_id_input.setAttribute("type", "number");
+        account_id_input.id = "destination_account";
+        account_id_input.placeholder = "destination";
+        d_w_t_menu_div.appendChild(account_id_input);
+        d_w_t_menu_div.appendChild(document.createElement("br"));
+        d_w_t_menu_div.appendChild(document.createElement("br"));
+      }
+
+      // creating a submit button
+      var button = document.createElement("button");
+      button.setAttribute("type","button");
+      button.innerHTML = 'submit';
+      button.setAttribute('onclick',show_options+'()');
+      d_w_t_menu_div.appendChild(button);
+
+    }
+  }
+
+  var source_account = document.getElementById("account_id");
+
+  function deposit(){
+    var amount = document.getElementById("deposit_amount");
+    console.log("deposit amount : "+amount.value);
+    console.log("deposit account : "+source_account.value);
+
+    data = {source_account:source_account.value,deposit_amount:amount.value}
+
+    postData('/deposit', data)
+      .then(data => {
+        console.log(data);
+
+        if (data["message"] == "error"){
+          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          location.reload();
+        }
+        else{
+          alert(data["message"]);
+        }
+
+      });
+
+  }
+
+  function withdraw(){
+    var amount = document.getElementById("withdraw_amount");
+    console.log("withdraw amount "+amount.value);
+    console.log("withdraw account "+source_account.value);
+
+    data = {source_account:source_account.value,withdraw_amount:amount.value}
+
+    postData('/withdraw', data)
+      .then(data => {
+        console.log(data);
+
+        if (data["message"] == "error"){
+          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          location.reload();
+        }
+        else{
+          alert(data["message"]);
+        }
+
+      });
+
+  }
+
+  function transfer(){
+    var amount = document.getElementById("transfer_amount");
+    var destination_account = document.getElementById("destination_account");
+    console.log("transfer amount "+amount.value);
+    console.log("source account "+source_account.value);
+    console.log("destination account "+destination_account.value);
+
+    data = {
+      source_account:source_account.value,
+      transfer_amount:amount.value,
+      destination_account:destination_account.value,
+    }
+
+    postData('/transfer', data)
+      .then(data => {
+        console.log(data);
+
+        if (data["message"] == "error"){
+          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          location.reload();
+        }
+        else{
+          alert(data["message"]);
+        }
+
+      });
+
+  }
+
   </script>
-  <form method="post">
-    <div class="container">
-      <label for="customer_ssn_id"><b>Customer SSN ID</b></label>
-      <input type="text" id="customer_ssn_id"><br>
-      <div>
-        <h4>OR</h4>
-      </div>
-      <label for="account_id"><b>Account ID</b></label>
-      <input type="text" name="account_id" id="account_id"><br>
- 
-      <button type="button" onclick="get_account_details()">Get Detials</button><br><br>
-    </div>
-<!--   </form>
-
-  <form> -->
-    <div style="display:none;" id="details_div">
-      <label for="accounts"><b>accounts</b></label>
-      <select id="accounts" name="accounts" onchange="select_account()">
-
-      </select><br>
-    </div><br>
-
-    <div style="display:none;" id="single_account_details">
-      <label for="customer_id"><b>Customer ID</b></label>
-      <input type="text" id="customer_id" readonly><br>
-
-      <label for="display_account_id"><b>Account ID</b></label>
-      <input type="text" id="display_account_id" readonly><br>
-
-      <label for="account_type"><b>Account type</b></label>
-      <input type="text" id="account_type" readonly><br>
-
-      <label for="balance"><b>Balance</b></label>
-      <input type="text" id="balance" readonly><br>
-    </div><br>
-
-    <div id="deposit_withdraw_transfer" style="display:none;">
-      <button type="submit" formaction="/deposit">Deposit</button><br><br>
-      <button type="submit" formaction="/withdraw">withdraw</button><br><br>
-      <button type="submit" formaction="/transfer">transfer</button><br><br>
-    </div>
-  </form>
 
 </body>
 <footer></footer>
