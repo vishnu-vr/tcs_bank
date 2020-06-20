@@ -97,8 +97,8 @@
       new_row.id = "ws_cust_id";
 
       new_row = row.insertCell(1);
-      new_row.innerHTML = data[i]["ws_accnt_type"];
-      new_row.id = "ws_accnt_type";
+      new_row.innerHTML = data[i]["ws_acct_type"];
+      new_row.id = "ws_acct_type";
 
       new_row = row.insertCell(2);
       new_row.innerHTML = data[i]["status"];
@@ -132,7 +132,7 @@
           else{
             var row = document.getElementById(ws_cust_id);
             row.cells[0].innerHTML = data["ws_cust_id"];
-            row.cells[1].innerHTML = data["ws_accnt_type"];
+            row.cells[1].innerHTML = data["ws_acct_type"];
             row.cells[2].innerHTML = data["status"];
             row.cells[3].innerHTML = data["message"];
             row.cells[4].innerHTML = data["last_updated"];

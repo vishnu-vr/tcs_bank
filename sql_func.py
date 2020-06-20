@@ -6,6 +6,7 @@ from datetime import date,datetime
 # path='/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app'
 # DATABASE = '/Volumes/Macintosh HD/Users/vishnu/Desktop/tcs_bank/app/bank.db'
 DATABASE="bank.db"
+tables = ["account","account_status","cus_status","customers","user_store"]
 
 def update_cus_status(det,db):
 	cur = db.cursor()
@@ -31,7 +32,7 @@ def add_cus_status(det,db):
 				int(det["ws_ssn"]),
 				det["status"],
 				det["message"],
-				str(datetime.now())
+				str(datetime.now().replace(microsecond=0))
 				))
 		return True
 	except Exception as e :
@@ -58,14 +59,14 @@ def add_acc_status(det,db):
 	# db=get_db()
 	cur=db.cursor()	
 	try:
-		print(det)
+		# print(det)
 		cur.execute("INSERT INTO account_status (ws_cust_id,ws_acct_id,ws_acct_type,status,message,last_updated) VALUES (?,?,?,?,?,?)",
 			(	int(det["ws_cust_id"]),
 				int(det["ws_acct_id"]),
 				det["ws_acct_type"],
 				det["status"],
 				det["message"],
-				str(datetime.now())
+				str(datetime.now().replace(microsecond=0))
 				))
 		return True
 	except Exception as e :
@@ -94,7 +95,7 @@ def get_db():
     # return db
     return sqlite3.connect(DATABASE)
 
-def init_db_customers(db=get_db()):
+def init_customers(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE customers(
 		ws_ssn INTEGER NOT NULL UNIQUE,
@@ -106,9 +107,8 @@ def init_db_customers(db=get_db()):
 	# temp={"ws_name":"temp" ,"ws_adrs":"temp","state":"temp","city":"temp","ws_ssn":"000000000","ws_age":"00","ws_cust_id":"100000000"}
 	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "customers", 100000000 ));
 	db.commit()
-	db.close()
 
-def init_db_account(db=get_db()):
+def init_account(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE account(
 		ws_cust_id INTEGER NOT NULL,
@@ -123,19 +123,18 @@ def init_db_account(db=get_db()):
 	# "ws_acct_id":"500000000","ws_cust_id":"temp"}
 	cur.execute("insert into sqlite_sequence (name, seq) values (?, ?);",( "account", 500000000 ));
 	db.commit()
-	db.close()
 
-def init_db_transactions(acc_id,db=get_db()):
+def init_transactions(cus_id,db=get_db()):
 	cur=db.cursor()
-	tb="transactions"+str(acc_id)
-	cur.execute("""CREATE TABLE """+tb+"""(
-		ws_cust_id INTEGER NOT NULL PRIMARY KEY,
-		ws_acct_id INTEGER NOT NULL,
-		ws_amt INTEGER,
+	cur.execute("""CREATE TABLE transactions"""+str(cus_id)+""" (
+		ws_acct_id INTEGER NOT NULL PRIMARY KEY,
+		ws_acct_type TEXT,
 		ws_trxn_date TEXT,
-		ws_src_typ TEXT,
-		ws_tgt_typ TEXT
+		ws_trxn_type TEXT,
+		ws_amt INTEGER,
+		ws_acct_balance REAL
 		)""")
+	return True
 
 def init_account_status(db=get_db()):
 	cur=db.cursor()
@@ -148,7 +147,6 @@ def init_account_status(db=get_db()):
 		last_updated TEXT
 		)""")
 	db.commit()
-	db.close()	
 
 def init_cus_status(db=get_db()):
 	cur=db.cursor()
@@ -160,9 +158,8 @@ def init_cus_status(db=get_db()):
 		last_updated TEXT
 		)""")
 	db.commit()
-	db.close()
 
-def init_db_user_store(db=get_db()):
+def init_user_store(db=get_db()):
 	cur=db.cursor()
 	cur.execute("""CREATE TABLE user_store(
 		login_id text NOT NULL PRIMARY KEY,
@@ -171,7 +168,26 @@ def init_db_user_store(db=get_db()):
 		type Text 
 		)""")
 	db.commit()
-	db.close()
+
+def init_tables(db=get_db()):
+	cur=db.cursor()
+	global tables
+	try:
+		cur.execute("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';")
+		fetched_tables=[item[0] for item in cur.fetchall()]
+		# print(fetched_tables)
+		for items in tables:
+			if items not in fetched_tables:
+				eval("init_"+items+"(db)")
+		db.commit()
+	except Exception as e:
+		print(e)
+		db.rollback()
+		db.close()
+		return False
+	finally:
+		db.close()
+	return True
 
 def get_user(**det):
 	db=get_db()
@@ -205,7 +221,7 @@ def add_new_cus(**det):
 		det["message"]="customer created successfully"
 		cur.execute("SELECT last_insert_rowid()")
 		det["ws_cust_id"]=str(cur.fetchone()[0])
-		if add_cus_status(det,db):
+		if add_cus_status(det,db) and init_transactions(det["ws_cust_id"],db):
 			db.commit()
 			return True
 		else:
@@ -232,7 +248,7 @@ def update_cus(**det):
 				det["ws_adrs"]=det["ws_adrs"]+"#"+old_det["state"]+"#"+old_det["city"]
 			cur.execute("UPDATE customers SET "+cn+" = ? where ws_cust_id = ?",(det[cn],det["ws_cust_id"]))
 		log_dic={"message":"customer update complete",
-					"last_updated":str(datetime.now()),
+					"last_updated":str(datetime.now().replace(microsecond=0)),
 					"ws_cust_id":det["ws_cust_id"]}
 		if update_cus_status(log_dic,db):	
 			db.commit()
@@ -285,15 +301,20 @@ def add_new_account(**det):
 	db=get_db()
 	cur = db.cursor()
 	try:
+		cur.execute("SELECT * from customers where ws_cust_id=(?)",(det["ws_cust_id"],))
+		if cur.fetchone()==None:
+			raise Exception ("no such customer")
 		cur.execute("""INSERT INTO account (ws_cust_id,ws_acct_type,ws_acct_balance,ws_acct_crdate,ws_acct_lasttrdate)
 		 VALUES (?,?,?,?,?)""",
-		 (int(det["ws_cust_id"]),det["ws_acct_type"],float(det["ws_acct_balance"]),str(date.today()),str(date.today())))
+		 (int(det["ws_cust_id"]),det["ws_acct_type"],float(det["ws_acct_balance"]),
+		 	str(datetime.now().replace(microsecond=0)),str(datetime.now().replace(microsecond=0))))
 		cur.execute("SELECT last_insert_rowid()")
 		det["ws_acct_id"]=str(cur.fetchone()[0])
 		det["status"]="ACTIVE"
 		det["message"]="Account creation complete"
-		if add_acc_status(det,db):
-			init_db_transactions(det["ws_acct_id"],db)
+		det["transaction_type"]="Deposit"
+		det["ws_amt"]=det["ws_acct_balance"]
+		if add_acc_status(det,db) and add_trans(det,db):
 			db.commit()
 			return True
 		else:
@@ -311,13 +332,16 @@ def get_account_det(**det):
 	cur = db.cursor()
 	acc_id=list(det.keys())[0]
 	try:
-		if acc_id=="ws_acct_id":
+		if acc_id == "all":
+			cur.execute("SELECT * from account")
+			acc_det=cur.fetchall()
+		if acc_id == "ws_acct_id":
 			cur.execute("SELECT * FROM account where "+acc_id+" = (?)",(int(det[acc_id]),))
 			acc_det=cur.fetchone()
-		elif acc_id=="ws_cust_id":
+		elif acc_id == "ws_cust_id":
 			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(det["ws_cust_id"]),))
 			acc_det=cur.fetchall()
-		elif acc_id=="ws_ssn":
+		elif acc_id =="ws_ssn":
 			cur.execute("SELECT ws_cust_id FROM customers where ws_ssn=(?)",(int(det["ws_ssn"]),))
 			cust_id=cur.fetchone()
 			cur.execute("SELECT * FROM account where ws_cust_id=(?)",(int(cust_id["ws_cust_id"]),))
@@ -341,7 +365,7 @@ def del_account(**det):
 	try:
 		account_det=get_account_det(**det)
 		cur.execute("DELETE FROM account where ws_acct_id = (?)",(det["ws_acct_id"],))
-		det={"message":"Account deleted","status":"DEACTIVE","last_updated":str(datetime.now())}
+		det={"message":"Account deleted","status":"DEACTIVE","last_updated":str(datetime.now().replace(microsecond=0))}
 		if update_acc_status(det,db):
 			db.commit()
 			return account_det
@@ -374,9 +398,30 @@ def get_cus_status(det=None):
 		db.close()
 	return False
 	
+def get_account_status(det=None):
+	db=get_db()
+	db.row_factory = dict_factory
+	cur = db.cursor()
+	try:
+		if det==None:
+			cur.execute("SELECT * FROM account_status")
+			status=cur.fetchall()
+		else:
+			cur.execute("SELECT * FROM account_status where ws_cust_id=(?)",(det["ws_cust_id"],))
+			status=cur.fetchone()
+		db.commit()
+		db.close()
+		return status
+	except Exception as e :
+		db.rollback()
+		print(e)
+	finally:
+		db.close()
+	return False
+
 def get_acc_names(**det):
 	acc_det=get_account_det(**det)
-	print(acc_det)
+	# print(acc_det)
 	if acc_det != False:
 		l=[]
 		for i in acc_det:
@@ -385,47 +430,81 @@ def get_acc_names(**det):
 	else:
 		return False
 
-# ws_cust_id INTEGER NOT NULL PRIMARY KEY,
-# 		ws_acct_id INTEGER NOT NULL,
-# 		ws_amt INTEGER,
-# 		ws_trxn_date TEXT,
-# 		ws_src_typ TEXT,
-# 		ws_tgt_typ
+def update_bal(det,db=get_db()):
+	cur=db.cursor()
+	try:
+		cur.execute("SELECT ws_acct_balance from account where ws_acct_id=(?)",(int(det["ws_acct_id"]),))
+		old_bal=cur.fetchone()[0]
+		if det["transaction_type"] == "credited":
+			bal=old_bal+float(det["amount"])
+		else:
+			bal=old_bal-float(det["amount"])
+			if bal<0:
+				return "Not enough balance in account"
+		cur.execute("UPDATE account set ws_acct_balance=(?),ws_acct_lasttrdate=(?) where ws_acct_id =(?)",
+			((bal),(str(datetime.now().replace(microsecond=0))),(int(det["ws_acct_id"]))))
+		if update_acc_status({"message":"Amount "+det["transaction_type"],
+			"last_updated":(str(datetime.now().replace(microsecond=0))),
+			"ws_acct_id":det["ws_acct_id"]
+			},db):
+			return True	
+	except Exception as e:
+		print (e)
+	return False
+
+def transact(**det):
+	db=get_db()
+	data_req=["amount","from_ws_acct_id","to_ws_acct_id","transaction_type"]
+	try:
+		if data_req != sorted(det.keys()):
+			raise Exception ("Details not provided")		
+		if det["transaction_type"] == "deposit":
+			res=update_bal({"amount":det["amount"],"transaction_type":"credited","ws_acct_id":det["from_ws_acct_id"]},db)
+		elif det["transaction_type"] == "withdraw":
+			res=update_bal({"amount":det["amount"],"transaction_type":"debited","ws_acct_id":det["from_ws_acct_id"]},db)
+		elif det["transaction_type"] == "transfer":
+			res=update_bal({"amount":det["amount"],"transaction_type":"transfered","ws_acct_id":det["from_ws_acct_id"]},db)
+			if res == True:
+				res=update_bal({"amount":det["amount"],"transaction_type":"credited","ws_acct_id":det["to_ws_acct_id"]},db)
+		else:
+			raise Exception("function not defined")
+		if res == True:
+			db.commit()
+			db.close()
+			return True
+		elif res == "Not enough balance in account":
+			db.rollback()
+			db.close()
+			return res
+		else:
+			raise Exception ("Something went wrong at transaction")
+	except Exception as e:
+		print (e)
+		db.rollback()
+		db.close()
+	finally:
+		db.close()
+	return False
+
 def add_trans(det,db=get_db()):
-	# cur=db.cursor()
-	# try:
-	# 	tb=transactions+str(det["ws_acct_id"])
-	# 	cur.execute("INSERT INTO "+tb+" VALUES()")
-	# except Exception as e:
-	# 	raise
-	# else:
-	# 	pass
-	# finally:
-	pass
-
-def withdaraw(**det):
-	# db=get_db()
-	# cur=db.cursor()
-	# try:
-	# 	cur.execute("SELECT * from account where ws_acct_id=(?)"(det["ws_acct_id"],))
-	# 	acc=cur.fetchone()
-	# 	if acc=None:
-	# 		return "NO ACCOUNT"
-	# 	else:
-	# 		ba=acc["ws_amt"]-float(det["amount"])
-	# 		cur.execute("UPDATE account SET ws_acct_balance=(?)",(ba,))
-
-	# except Exception as e:
-	# 	raise
-	# else:
-	# 	pass
-	# finally:
-	pass
+	cur=db.cursor()
+	try:
+		tb=str(det["ws_cust_id"])
+		cur.execute("INSERT INTO transactions"+tb+" VALUES(?,?,?,?,?,?)",(
+				det["ws_acct_id"],
+				det["ws_acct_type"] ,
+				str(datetime.now().replace(microsecond=0)),
+				det["transaction_type"] ,
+				float(det["ws_amt"]) ,
+				float(det["ws_acct_balance"])
+			))
+		return True
+	except Exception as e:
+		print(e)
+	return False
 
 
-
-
-
+init_tables()
 if __name__=='__main__':
 	# init_db()
 	# init_db_user_store()
@@ -446,5 +525,6 @@ if __name__=='__main__':
 	# add_new_account(**d)
 	# print(get_account_det(**{"ws_cust_id":"2"}))
 	# print(del_account(**{"ws_acct_id":"500000004"}))
-	add_new_user(**usr)
-
+	# add_new_user(**usr)
+	t={"transaction_type":"transfer","amount":"1500","to_ws_acct_id":"500000004","from_ws_acct_id":"500000001"}
+	# print(transact(**t))
