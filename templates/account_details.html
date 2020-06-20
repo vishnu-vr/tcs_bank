@@ -259,6 +259,12 @@
 
   function deposit(){
     var amount = document.getElementById("deposit_amount");
+
+    if (amount.value < 1) {
+      alert("enter an amount greater than 0");
+      return
+    }
+
     console.log("deposit amount : "+amount.value);
     console.log("deposit account : "+source_account.value);
 
@@ -274,6 +280,7 @@
         }
         else{
           alert(data["message"]);
+          document.getElementById("balance").value =  parseInt(document.getElementById("balance").value)+parseInt(amount.value);
         }
 
       });
@@ -282,6 +289,12 @@
 
   function withdraw(){
     var amount = document.getElementById("withdraw_amount");
+
+    if (amount.value < 1) {
+      alert("enter an amount greater than 0");
+      return
+    }
+
     console.log("withdraw amount "+amount.value);
     console.log("withdraw account "+source_account.value);
 
@@ -297,6 +310,7 @@
         }
         else{
           alert(data["message"]);
+          document.getElementById("balance").value =  parseInt(document.getElementById("balance").value)-parseInt(amount.value);
         }
 
       });
@@ -305,7 +319,20 @@
 
   function transfer(){
     var amount = document.getElementById("transfer_amount");
+
+    if (amount.value < 1) {
+      alert("enter an amount greater than 0");
+      return;
+    }
+
     var destination_account = document.getElementById("destination_account");
+
+    // checking if source and destination is same?
+    if (destination_account.value == source_account.value) {
+      alert("Source and Destination cannot be the same");
+      return;
+    }
+
     console.log("transfer amount "+amount.value);
     console.log("source account "+source_account.value);
     console.log("destination account "+destination_account.value);
@@ -326,6 +353,7 @@
         }
         else{
           alert(data["message"]);
+          document.getElementById("balance").value =  parseInt(document.getElementById("balance").value)-parseInt(amount.value);
         }
 
       });
