@@ -561,7 +561,7 @@ def get_statement(**det):
 		tb="transactions"+str(cur.fetchone()["ws_cust_id"])
 		if "nos" in det.keys():
 			cur.execute("SELECT * from "+tb+" where ws_acct_id=(?) order by ws_trxn_date desc;",(int(det["ws_acct_id"]),))
-			statements=cur.fetchmany(det["nos"])
+			statements=cur.fetchmany(int(det["nos"]))
 		elif "from_ws_trxn_date" in det.keys():
 			cur.execute("SELECT * from "+tb+" where ws_acct_id=(?) and ws_trxn_date between (?) and (?) order by ws_trxn_date;",
 				((int(det["ws_acct_id"])),(det["from_ws_trxn_date"]+" 00:00:00"),(det["to_ws_trxn_date"]+" 23:59:59"))
@@ -603,10 +603,16 @@ if __name__=='__main__':
 	# print(get_account_det(**{"ws_cust_id":"2"}))
 	# print(del_account(**{"ws_acct_id":"500000004"}))
 	# add_new_user(**usr)
-	t={"transaction_type":"withdraw","amount":"1000","ws_acct_id":"500000002"}#,"to_ws_acct_id":"500000001","from_ws_acct_id":"500000002"}
+	t={"transaction_type":"transfer","amount":"1000","to_ws_acct_id":"500000001","from_ws_acct_id":"500000002"}
 	# print(transact(**t))
 	# get_account_status(ws_acct_id="500000002")
 	# res=get_statement(ws_acct_id="500000001")#,from_ws_trxn_date="2020-06-21",to_ws_trxn_date="2020-06-22")
 	# print(*res,sep="\n")
+
+	det1={"ws_acct_id":"500000001","from_ws_trxn_date":"2020-06-21","to_ws_trxn_date":"2020-06-22"}
+	det2={"ws_acct_id":"500000001","nos":"5"}
+	det3={"ws_acct_id":"500000001"}
+	res=get_statement(**det3)
+	print(*res,sep="\n")
 		
 

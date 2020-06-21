@@ -408,6 +408,16 @@ def account_details_testing():
         else:
             return make_response(jsonify({"message":"error"}),200)
 
+@app.route('/transaction_history',methods=['POST'])
+def transaction_history():
+    if request.method == 'POST':
+        # data_from_db = [{'ws_acct_id': 500000001, 'ws_acct_type': 'savings', 'ws_trxn_date': '2020-06-21 00:16:42', 'ws_trxn_type': 'Deposit', 'ws_amt': 1200, 'ws_acct_balance': 1200.0}]
+        data_from_db = sql.get_statement(**request.get_json())
+        # data_from_db=0
+        if data_from_db:
+            return make_response(jsonify(data_from_db),200)
+        else:
+            return make_response(jsonify({"message":"error"}),200)
 
 if __name__ == "__main__":
     app.run("localhost",1234,debug=True);
