@@ -82,44 +82,53 @@ def get_single_account_detail():
 # deposit money
 @app.route('/deposit',methods=['POST'])
 def deposit():
-	if request.method == 'POST':
-		# print(request.get_json())
-		# for i in range(10):
-		# 	print(0)
+    if request.method == 'POST':
+        # print(request.get_json())
+        # for i in range(10):
+        # 	print(0)
 
-		data_from_db = 1
-		if data_from_db:
-		    return make_response(jsonify({"message":"Amount deposited successfully"}),200)
-		else:
-			return make_response(jsonify({"message":"error"}),200)
+        data_from_db = sql.transact(**request.get_json())
+        if data_from_db == True:
+            return make_response(jsonify({"message":"Amount deposited successfully"}),200)
+        elif data_from_db == False:
+            return make_response(jsonify({"message":"error"}),200)
+        else:
+            return make_response(jsonify({"message":"error","message_from_db":data_from_db}),200)
 
 # withdraw money
 @app.route('/withdraw',methods=['POST'])
 def withdraw():
-	if request.method == 'POST':
-		# print(request.get_json())
-		# for i in range(10):
-		# 	print(0)
+    if request.method == 'POST':
+        # print(request.get_json())
+        # for i in range(10):
+        # 	print(0)
 
-		data_from_db = 1
-		if data_from_db:
-		    return make_response(jsonify({"message":"Amount withdrawed successfully"}),200)
-		else:
-			return make_response(jsonify({"message":"error"}),200)
+        data_from_db = sql.transact(**request.get_json())
+        # print(data_from_db)
+        # for i in range(10):
+        #     print(0)
+        if data_from_db == True:
+            return make_response(jsonify({"message":"Amount withdrawed successfully"}),200)
+        elif data_from_db == False:
+            return make_response(jsonify({"message":"error"}),200)
+        else:
+            return make_response(jsonify({"message":"error","message_from_db":data_from_db}),200)
 
 # transfer money
 @app.route('/transfer',methods=['POST'])
 def transfer():
     if request.method == 'POST':
-    	# print(request.get_json())
-    	# for i in range(10):
-    	# 	print(0)
 
-    	data_from_db = 1
-    	if data_from_db:
-    		return make_response(jsonify({"message":"Amount transfered successfully"}),200)
-    	else:
-    		return make_response(jsonify({"message":"error"}),200)
+        data_from_db = sql.transact(**request.get_json())
+        # print(request.get_json())
+        # for i in range(10):
+        #     print(0)
+        if data_from_db == True:
+            return make_response(jsonify({"message":"Amount transfered successfully"}),200)
+        elif data_from_db == False:
+            return make_response(jsonify({"message":"error"}),200)
+        else:
+            return make_response(jsonify({"message":"error","message_from_db":data_from_db}),200)
 
 # get account details
 @app.route('/account_details',methods = ['POST', 'GET'])

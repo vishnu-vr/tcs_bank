@@ -268,14 +268,15 @@
     console.log("deposit amount : "+amount.value);
     console.log("deposit account : "+source_account.value);
 
-    data = {source_account:source_account.value,deposit_amount:amount.value}
+    data = {transaction_type:'deposit',ws_acct_id:source_account.value,amount:amount.value}
 
     postData('/deposit', data)
       .then(data => {
         console.log(data);
 
         if (data["message"] == "error"){
-          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          if ("message_from_db" in data) alert(data["message_from_db"]);
+          else alert("something went wrong!");
           location.reload();
         }
         else{
@@ -298,14 +299,15 @@
     console.log("withdraw amount "+amount.value);
     console.log("withdraw account "+source_account.value);
 
-    data = {source_account:source_account.value,withdraw_amount:amount.value}
+    data = {transaction_type:'withdraw',ws_acct_id:source_account.value,amount:amount.value}
 
     postData('/withdraw', data)
       .then(data => {
         console.log(data);
 
         if (data["message"] == "error"){
-          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          if ("message_from_db" in data) alert(data["message_from_db"]);
+          else alert("something went wrong!");
           location.reload();
         }
         else{
@@ -338,9 +340,10 @@
     console.log("destination account "+destination_account.value);
 
     data = {
-      source_account:source_account.value,
-      transfer_amount:amount.value,
-      destination_account:destination_account.value,
+      transaction_type:'transfer',
+      from_ws_acct_id:source_account.value,
+      to_ws_acct_id:destination_account.value,
+      amount:amount.value
     }
 
     postData('/transfer', data)
@@ -348,7 +351,8 @@
         console.log(data);
 
         if (data["message"] == "error"){
-          alert("something went wrong! Maybe this customer doesn't have any accounts");
+          if ("message_from_db" in data) alert(data["message_from_db"]);
+          else alert("something went wrong!");
           location.reload();
         }
         else{
